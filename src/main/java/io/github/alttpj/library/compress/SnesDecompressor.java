@@ -16,15 +16,13 @@
 
 package io.github.alttpj.library.compress;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SnesDecompressor extends FilterInputStream {
+public class SnesDecompressor implements AutoCloseable {
 
   private static final Logger LOG = LoggerFactory.getLogger(SnesDecompressor.class);
 
@@ -39,7 +37,9 @@ public class SnesDecompressor extends FilterInputStream {
    * Second half is the length.
    */
   private static final int HEADER_MASK_LEN = 0b00001111;
-  private final boolean closed = false;
+
+  private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+  private final InputStream inputStream;
   /**
    * Indicates end of input stream.
    */
@@ -48,138 +48,82 @@ public class SnesDecompressor extends FilterInputStream {
    * current position in file. remove.
    */
   private int pos;
-  /**
-   * If more was read from a command than the output buffer would allow.
-   */
-  private byte[] remainder = new byte[0];
-
-  public SnesDecompressor(final InputStream inputStream) {
-    super(inputStream);
-  }
+  private boolean closed = false;
+  private byte[] decompressed = new byte[0];
+  private boolean readFully = false;
 
   private static String toBinaryString(final int command) {
     return String.format(Locale.ENGLISH,
         "%8s", Integer.toBinaryString(command)).replace(' ', '0');
   }
 
+  public SnesDecompressor(final InputStream inputStream) {
+    this.inputStream = inputStream;
+  }
+
+  public static String bytesToHex(final byte[] bytes) {
+    final char[] hexChars = new char[bytes.length * 2];
+    for (int j = 0; j < bytes.length; j++) {
+      final int v = bytes[j] & 0xFF;
+      hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+      hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+    }
+    return new String(hexChars);
+  }
+
+
+  public byte[] getDecompressed() {
+    ensureReadFully();
+    return this.decompressed;
+  }
+
   /**
    * Check to make sure that this stream has not been closed
    */
-  private void ensureOpen() throws IOException {
-    if (this.closed) {
-      throw new IOException("Stream closed");
+  private void ensureReadFully() {
+    if (!this.readFully) {
+      readFully();
     }
   }
 
-  @Override
-  public int read() throws IOException {
-    final int read = super.read();
+  private int read() throws IOException {
+    final int read = this.inputStream.read();
     this.pos++;
     final String hex = String.format(Locale.ENGLISH, "%2s", Integer.toHexString(read)).replace(' ', '0');
     LOG.warn("read [{}] at [{}].", hex, this.pos);
     return read;
   }
 
-  @Override
   public int read(final byte[] outputBuffer, final int off, final int maxReadLength) throws IOException {
-    ensureOpen();
+    final int read = this.inputStream.read(outputBuffer, off, maxReadLength);
+    this.pos += read;
+    return read;
+  }
 
+  protected byte[] inflateNextCommand() throws IOException {
     if (this.eos) {
-      return -1;
-    }
-
-    if (outputBuffer.length < 1) {
-      return 0;
-    }
-
-    if (maxReadLength > outputBuffer.length) {
-      throw new IndexOutOfBoundsException("maxReadLength is greather then the output buffer");
-    }
-
-    if (this.remainder.length > 0) {
-      final int max = Math.max(maxReadLength, this.remainder.length);
-      System.arraycopy(this.remainder, 0, outputBuffer, 0, max);
-
-      if (max == this.remainder.length) {
-        // remainder was fully read.
-        this.remainder = new byte[0];
-      } else {
-        // remaining bytes from remainder
-        final byte[] newRemainder = new byte[this.remainder.length - max];
-        System.arraycopy(this.remainder, max, newRemainder, 0, newRemainder.length);
-        this.remainder = newRemainder;
-      }
-
-      return max;
+      return null;
     }
 
     final int header = read();
     final int command = header & HEADER_MASK_COMMAND;
     // always use one more byte.
+    // note: overwrite this if command is 0b0111! Then this is the actual command!
     final int commandLength = (header & HEADER_MASK_LEN) + 1;
 
     switch (command) {
       case 0b00000000:
-        if (LOG.isTraceEnabled()) {
-          LOG.trace("Command 0 - Read the next n bytes as is");
-        }
-
-        if (commandLength > maxReadLength) {
-          final int read = super.read(outputBuffer, 0, maxReadLength);
-          // TODO: implement add to remainder
-          this.remainder = new byte[commandLength - maxReadLength];
-          final int remainderRead = super.read(this.remainder, 0, this.remainder.length);
-          if (remainderRead != this.remainder.length) {
-            throw new IllegalStateException("Expected [" + this.remainder.length + "] bytes. Got [" + remainderRead + "].");
-          }
-          return read;
-        }
-
-        return super.read(outputBuffer, 0, commandLength);
+        return readCommand0(commandLength);
       case 0b00010000:
         LOG.warn("Command [{}] at position [{}].", command, this.pos);
         break;
       case 0b00100000:
-        if (LOG.isTraceEnabled()) {
-          // doc says sth different.
-          LOG.trace("Command 2 - Copy next byte n times?");
-        }
-
-        final int toDuplicate = read();
-
-        if (commandLength > maxReadLength) {
-          // copy maxReadLength to output
-          // move the remainder to the remainder
-          for (int ii = 0; ii < maxReadLength; ii++) {
-            outputBuffer[ii] = (byte) toDuplicate;
-          }
-
-          this.remainder = new byte[commandLength - maxReadLength];
-
-          for (int ii = maxReadLength; ii < commandLength; ii++) {
-            outputBuffer[ii] = (byte) toDuplicate;
-          }
-
-          return maxReadLength;
-        }
-
-        // copy all to output
-        for (int ii = 0; ii < commandLength; ii++) {
-          outputBuffer[ii] = (byte) toDuplicate;
-        }
-
-        return commandLength;
+        return readCommand2(commandLength);
       case 0b00110000:
         LOG.warn("Command [{}] from header [{}] at position [{}].", toBinaryString(command), Integer.toHexString(header), this.pos);
-        break;
+        return readCommand3(commandLength);
       case 0b01000000:
-        // Command 4 - read A, B
-        // A and B form an offset into the current output buffer (the bytes that have already been decompressed and copied to the output)
-        // let this offset be X
-        // X = A | ( B << 8 )
-        // (length parameter + 1) bytes are copied from within the current output buffer and appended to the end of the current output buffer
-        LOG.warn("Command [{}] from header [{}] at position [{}].", toBinaryString(command), Integer.toHexString(header), this.pos);
-        break;
+        return readCommand4(commandLength);
       case 0b01110000:
         throw new UnsupportedOperationException("Extension header");
       default:
@@ -188,27 +132,92 @@ public class SnesDecompressor extends FilterInputStream {
 
     }
 
-    final int n = super.read(outputBuffer, off, maxReadLength);
-
-    if (n == -1) {
-      return this.read(outputBuffer, off, maxReadLength);
-    }
-
-    return n;
+    throw new IllegalStateException("How did you get here?");
   }
 
-  public byte[] readFully() {
-    try (final ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-      final byte[] buffer = new byte[BUFFER_SIZE];
-      int numRead;
+  protected byte[] readCommand0(final int commandLength) throws IOException {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Command 0 - Read the next n bytes as is");
+    }
 
-      while ((numRead = read(buffer)) != -1) {
-        bos.write(buffer, 0, numRead);
+    final byte[] outputBuffer = new byte[commandLength];
+    final int read = read(outputBuffer, 0, commandLength);
+
+    if (read != commandLength) {
+      throw new IllegalStateException("Read [" + read + "] bytes when commoand was [" + commandLength + "]!");
+    }
+
+    return outputBuffer;
+  }
+
+  protected byte[] readCommand2(final int commandLength) throws IOException {
+    if (LOG.isTraceEnabled()) {
+      // doc says sth different.
+      LOG.trace("Command 2 - Copy next byte n times?");
+    }
+
+    final int toDuplicate = read();
+
+    final byte[] outputBuffer = new byte[commandLength];
+
+    // copy all to output
+    for (int ii = 0; ii < commandLength; ii++) {
+      outputBuffer[ii] = (byte) toDuplicate;
+    }
+
+    return outputBuffer;
+  }
+
+  private byte[] readCommand3(final int commandLength) {
+    LOG.warn("Len: [{}], Current: [{}]", Integer.toHexString(this.decompressed.length), bytesToHex(this.decompressed));
+
+    throw new UnsupportedOperationException("TODO: imlement");
+  }
+
+  /**
+   * Command 4: copy the next two bytes alternating to the output until length bytes have been copied.
+   */
+  protected byte[] readCommand4(final int commandLength) throws IOException {
+    // Command 4
+    // let the next byte of the input be A
+    // let the byte of the input after A be B
+    // A and B are copied (alternating, as in ABABABAB...) to the output until (length parameter + 1) bytes have been copied to the output
+    final byte[] readBuffer = new byte[2];
+    read(readBuffer, 0, 2);
+
+    final byte[] output = new byte[commandLength];
+
+    for (int ii = 0; ii < commandLength; ii++) {
+      output[ii] = readBuffer[ii % 2];
+    }
+
+    return output;
+  }
+
+  private void readFully() {
+    try {
+      byte[] buffer;
+
+      while ((buffer = inflateNextCommand()) != null) {
+        final byte[] newDecompressed = new byte[this.decompressed.length + buffer.length];
+        System.arraycopy(this.decompressed, 0, newDecompressed, 0, this.decompressed.length);
+        System.arraycopy(buffer, 0, newDecompressed, this.decompressed.length, buffer.length);
+        this.decompressed = newDecompressed;
       }
 
-      return bos.toByteArray();
+      this.readFully = true;
+      this.close();
     } catch (final IOException ioEx) {
       throw new IllegalStateException("Unable to read.", ioEx);
+    }
+  }
+
+  @Override
+  public void close() throws IOException {
+    if (this.inputStream != null && !this.closed) {
+      this.closed = true;
+      this.eos = true;
+      this.inputStream.close();
     }
   }
 }

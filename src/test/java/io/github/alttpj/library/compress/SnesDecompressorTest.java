@@ -29,7 +29,7 @@ public class SnesDecompressorTest {
     try (
         final InputStream oneUpStream = this.getClass().getResourceAsStream("/gfx/1up.bin");
         final SnesDecompressor snesD = new SnesDecompressor(oneUpStream)) {
-      decompressed = snesD.readFully();
+      decompressed = snesD.getDecompressed();
     }
 
     final byte[] expected;
@@ -42,7 +42,7 @@ public class SnesDecompressorTest {
     }
 
     Assertions.assertAll(
-        () -> Assertions.assertArrayEquals(null, decompressed)
+        () -> Assertions.assertArrayEquals(expected, decompressed)
     );
   }
 }
