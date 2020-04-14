@@ -73,7 +73,7 @@ public class SnesCompressor implements AutoCloseable {
       final byte[] readBytes = new byte[readCount];
       System.arraycopy(buffer, 0, readBytes, 0, readCount);
 
-      final CompressionResult compressionResult = getBestCompressionAlgorithm(readBytes);
+      final CompressionResult compressionResult = getBestCompressionAlgorithm(readBytes, this.alreadyProcessed.toByteArray());
 
       if (compressionResult.getAlgorithm() instanceof CopyCompressAlgorithm) {
         // if best gain is COPY, then iterate up to COMMAND_LENGTH_MAX_NORMAL +1 segments forward to find a better algorithm.
@@ -97,10 +97,10 @@ public class SnesCompressor implements AutoCloseable {
     this.isCompressed = true;
   }
 
-  private CompressionResult getBestCompressionAlgorithm(final byte[] buffer) {
+  protected static CompressionResult getBestCompressionAlgorithm(final byte[] buffer, final byte[] alreadyProcessed) {
     final TreeSet<CompressionResult> algos = Arrays.stream(CompressionAlgorithms.values())
         .map(CompressionAlgorithms::getCompressionAlgorithm)
-        .map(algo -> new CompressionResult(algo, buffer, this.alreadyProcessed.toByteArray()))
+        .map(algo -> new CompressionResult(algo, buffer, alreadyProcessed))
         .sorted()
         .collect(toCollection(TreeSet::new));
     return algos.stream()
@@ -127,14 +127,19 @@ public class SnesCompressor implements AutoCloseable {
       final byte[] newBuffer = new byte[maxSizeNewBuffer];
       System.arraycopy(buffer, readUncompressed, newBuffer, 0, newBuffer.length);
 
-      final CompressionResult bestCompressionAlgorithm = getBestCompressionAlgorithm(newBuffer);
+      final ByteArrayOutputStream simulatedAlreadyCompressed = new ByteArrayOutputStream();
+      simulatedAlreadyCompressed.write(this.alreadyProcessed.toByteArray());
+      // now simulating writing n bytes
+      simulatedAlreadyCompressed.write(buffer, 0, readUncompressed);
+
+      final CompressionResult bestCompressionAlgorithm = getBestCompressionAlgorithm(newBuffer, simulatedAlreadyCompressed.toByteArray());
       if (!(bestCompressionAlgorithm.getAlgorithm() instanceof CopyCompressAlgorithm)) {
         chainedCompressionAlgo = bestCompressionAlgorithm;
         break;
       }
     }
 
-    LOG.info("Not compressing next [{}] bytes.", readUncompressed);
+    LOG.trace("Not compressing next [{}] bytes.", readUncompressed);
     byte[] processed = new byte[readUncompressed];
     int read1 = this.inputStream.read(processed);
     byte[] compressed = new CopyCompressAlgorithm().apply(processed, read1 - 1);
@@ -147,7 +152,7 @@ public class SnesCompressor implements AutoCloseable {
       return;
     }
 
-    LOG.info("Chaining compression [{}].", chainedCompressionAlgo);
+    LOG.trace("Chaining compression [{}].", chainedCompressionAlgo);
 
     compressed = chainedCompressionAlgo.apply();
     processed = new byte[chainedCompressionAlgo.getCommandLength() + 1];

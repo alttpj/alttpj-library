@@ -16,7 +16,6 @@
 
 package io.github.alttpj.library.compress;
 
-import static io.github.alttpj.library.testhelper.HexTool.toHexString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -32,8 +31,12 @@ import java.io.InputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SnesCompressorTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(SnesCompressorTest.class);
 
   @ParameterizedTest
   @ValueSource(strings = {"1up", "birb", "coin", "icerod", "meat", "yoshi", "z1link"})
@@ -53,11 +56,9 @@ public class SnesCompressorTest {
     // then
     assertAll(
         () -> assertThat("must be smaller than input", compressed.length, is(lessThanOrEqualTo(originalLength))),
-        // enable the next test when #testCompressionSequenceRepeating is implemented.
-        // () -> assertThat("must be smaller than reference.", compressed.length, is(lessThanOrEqualTo(getExpectedMaxLength(gfx)))),
+        //() -> assertThat("must be smaller than reference.", compressed.length, is(lessThanOrEqualTo(getExpectedMaxLength(gfx)))),
         () -> assertThat("must not be unbelievably small", compressed.length, is(greaterThan(10)))
     );
-    System.out.println(toHexString(compressed));
 
     // when decompressed
     final byte[] decompressed;
@@ -140,12 +141,13 @@ public class SnesCompressorTest {
     }
 
     // then
-    final byte[] expected = new byte[]{
-        (byte) 0b001_00111, (byte) 0x00, // first 8 bytes to command 1 length=7
-        (byte) 0b001_00111, (byte) 0xab, // next 8 bytes to command 1 length=7
-        (byte) 0b001_01011, (byte) 0x00, // next 12 bytes to command 1 length=11,
-        (byte) 0b001_00011, (byte) 0xab, // copy from position 4 of original input stream length=7
-        (byte) 0xFF  // end of stream
+    final byte[] expected = {
+        // write first 8 (cl=7) bytes as-is
+        (byte) 0b000_00111, (byte) 0xab, (byte) 0xaf, (byte) 0x12, (byte) 0x01, (byte) 0x43, (byte) 0x44, (byte) 0x41, (byte) 0x23,
+        // make repeat: command 4, length 7, offset 00.
+        (byte) 0b100_00111, (byte) 0x00, (byte) 0x00,
+        // EOF
+        (byte) 0xFF
     };
 
     assertArrayEquals(expected, compressed, "Should compress like this.");
