@@ -16,6 +16,9 @@
 
 package io.github.alttpj.library.compress.impl;
 
+import static io.github.alttpj.library.compress.CompressorConstants.COMMAND_LENGTH_MAX_EXTENDED;
+import static io.github.alttpj.library.compress.CompressorConstants.COMMAND_LENGTH_MAX_NORMAL;
+
 import io.github.alttpj.library.compress.CompressionAlgorithm;
 import java.util.StringJoiner;
 
@@ -27,12 +30,45 @@ public class IncrementByteCompressionAlgorithm extends AbstractCompressionAlgori
 
   @Override
   public int brute(final byte[] input, final byte[] alreadyProcessedUncompressed) {
-    return 0;
+    if (input.length < 4) {
+      return 0;
+    }
+
+    int incrementCount = 1;
+    for (int ii = 1; ii < Math.min(input.length, COMMAND_LENGTH_MAX_EXTENDED); ii++) {
+      if (input[ii] != input[0] + ii) {
+        break;
+      }
+
+      incrementCount++;
+    }
+
+    if (incrementCount < 4) {
+      // does not suffice.
+      return 0;
+    }
+
+    return incrementCount - 1;
   }
 
   @Override
   public byte[] apply(final byte[] input, final int commandLength) {
-    return new byte[0];
+    if (commandLength > COMMAND_LENGTH_MAX_NORMAL) {
+      final byte[] out = new byte[3];
+
+      // 0b11100000 (extension command) + length to bytes 0,1
+      writeExtendedHeader(out, commandLength);
+
+      out[2] = input[0];
+
+      return out;
+    }
+
+    final byte[] out = new byte[2];
+    out[0] = (byte) ((getCommandNum() << 5) + commandLength);
+    out[1] = input[0];
+
+    return out;
   }
 
   @Override

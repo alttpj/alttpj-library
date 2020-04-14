@@ -60,13 +60,14 @@ abstract class AbstractCompressionAlgorithm implements CompressionAlgorithm {
     }
 
     // use the bits 0011_0000 from the commandLength int and use them as 0000_0011;
-    int headerByte = ((byte) (commandLength >> 8));
+    //     out[1] = (byte) ((this.posInUncompressed >> 8) & 0xFF);
+    int headerByte = ((byte) (commandLength >> 8 & 0xFF));
     // nudge the commandNum to position 0001_11000.
     headerByte = headerByte | (getCommandNum() << 2);
     // set first three bits to 111 to indicate extended header
     headerByte = headerByte | 0b11100000;
     buffer[0] = (byte) headerByte;
-    buffer[1] = (byte) ((commandLength));
+    buffer[1] = (byte) (commandLength & 0xFF);
   }
 
   @Override

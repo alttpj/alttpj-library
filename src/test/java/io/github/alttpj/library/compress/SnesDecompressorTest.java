@@ -16,16 +16,20 @@
 
 package io.github.alttpj.library.compress;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class SnesDecompressorTest {
 
   @ParameterizedTest
-  @ValueSource(strings = {"1up", "coin", "meat", "yoshi"})
+  @ValueSource(strings = {"1up", "birb", "coin", "icerod", "meat", "yoshi", "z1link"})
   void testDecompression(final String gfx) throws IOException {
     final byte[] expected;
     try (
@@ -36,6 +40,7 @@ public class SnesDecompressorTest {
       System.arraycopy(buffer, 0, expected, 0, readCount);
     }
 
+    // when decompressed
     final byte[] decompressed;
     try (
         final InputStream oneUpStream = this.getClass().getResourceAsStream("/gfx/" + gfx + ".bin");
@@ -43,8 +48,55 @@ public class SnesDecompressorTest {
       decompressed = snesD.getDecompressed();
     }
 
+    // then
     Assertions.assertAll(
-        () -> Assertions.assertArrayEquals(expected, decompressed)
+        () -> assertArrayEquals(expected, decompressed)
     );
+  }
+
+  @Test
+  void testReadExtendedHeaderCommand4Length40() throws IOException {
+    // given
+    final byte[] bytes = new byte[]{
+        // copy one byte "as-is", to set up "already decompressed.
+        (byte) 0b000_00000, (byte) 0x00,
+        // "extended, command 4, len = 41, offset = 0
+        (byte) 0b111_10000, (byte) 0b00101001, (byte) 0b00000000, (byte) 0b00000000};
+
+    // when decompressed
+    final byte[] decompressed;
+    try (final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        final SnesDecompressor snesDecompressor = new SnesDecompressor(bais)) {
+      snesDecompressor.readNextCommand();
+      final byte read = (byte) bais.read();
+      decompressed = snesDecompressor.readExtensionCommand(read);
+    }
+
+    // then
+    final byte[] expected = new byte[42];
+    assertArrayEquals(expected, decompressed);
+  }
+
+  @Test
+  void testReadExtendedHeaderCommand4Length40Pos1() throws IOException {
+    // given
+    final byte[] bytes = new byte[]{
+        // copy next two bytes, to set up "already decompressed.
+        (byte) 0b001_00001, (byte) 0x00,
+        // "extended, command 4, len = 41, offset = 0
+        (byte) 0b111_100_00, (byte) 0b00101001, (byte) 0b00000001, (byte) 0b00000000};
+
+    // when decompressed
+    final byte[] decompressed;
+    try (final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        final SnesDecompressor snesDecompressor = new SnesDecompressor(bais)) {
+      snesDecompressor.readNextCommand();
+      final byte read = (byte) bais.read();
+      decompressed = snesDecompressor.readExtensionCommand(read);
+    }
+
+    // then
+    final byte[] expected = new byte[42];
+    assertArrayEquals(expected, decompressed);
   }
 }

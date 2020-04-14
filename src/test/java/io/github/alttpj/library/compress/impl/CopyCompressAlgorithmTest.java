@@ -1,0 +1,44 @@
+/*
+ * Copyright 2020-2020 the ALttPJ Team @ https://github.com/alttpj
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.github.alttpj.library.compress.impl;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+public class CopyCompressAlgorithmTest {
+
+  @Test
+  void testCopyApplied() {
+    // given
+    final CopyCompressAlgorithm algorithm = new CopyCompressAlgorithm();
+    final byte[] in = {(byte) 0xac, (byte) 0xad};
+
+    // when
+    final byte[] apply = algorithm.apply(in, in.length - 1);
+
+    // then
+    final byte[] expected = new byte[]{(byte) 0b000_00001, (byte) 0xac, (byte) 0xad};
+    assertAll(
+        () -> assertEquals(in.length + 1, apply.length),
+        () -> assertArrayEquals(expected, apply)
+    );
+  }
+
+}

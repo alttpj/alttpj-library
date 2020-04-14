@@ -17,6 +17,7 @@
 package io.github.alttpj.library.compress;
 
 import java.util.Comparator;
+import java.util.StringJoiner;
 
 public class CompressionResult implements Comparable<CompressionResult> {
 
@@ -65,4 +66,13 @@ public class CompressionResult implements Comparable<CompressionResult> {
         .compare(this, other);
   }
 
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", "CompressionResult{", "}")
+        .add("input=" + this.input.length)
+        .add("algorithm=" + this.algorithm)
+        .add("commandLength=" + this.commandLength)
+        .add("alreadyProcessed=" + this.alreadyProcessed.length)
+        .toString();
+  }
 }

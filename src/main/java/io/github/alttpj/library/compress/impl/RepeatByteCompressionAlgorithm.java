@@ -29,14 +29,22 @@ public class RepeatByteCompressionAlgorithm extends AbstractCompressionAlgorithm
 
   @Override
   public int brute(final byte[] input, final byte[] alreadyProcessedUncompressed) {
-    final byte repeatable = input[0];
-    int repeatCount = 0;
-    for (int ii = 0; ii <= COMMAND_LENGTH_MAX_EXTENDED; ii++) {
-      if (input[ii] != repeatable) {
+    if (input.length < 4) {
+      return 0;
+    }
+
+    int repeatCount = 1;
+    for (int ii = 1; ii < Math.min(input.length, COMMAND_LENGTH_MAX_EXTENDED); ii++) {
+      if (input[ii] != input[0]) {
         break;
       }
 
       repeatCount++;
+    }
+
+    if (repeatCount < 4) {
+      // this is the same as just copying using Copy.cl=1
+      return 0;
     }
 
     // command length is count - 1.
@@ -45,10 +53,6 @@ public class RepeatByteCompressionAlgorithm extends AbstractCompressionAlgorithm
 
   @Override
   public byte[] apply(final byte[] input, final int commandLength) {
-    if (input.length < commandLength + 1) {
-      throw new IllegalArgumentException("input does not have enough bytes!");
-    }
-
     final byte repeatedChar = input[0];
 
     if (commandLength > COMMAND_LENGTH_MAX_NORMAL) {

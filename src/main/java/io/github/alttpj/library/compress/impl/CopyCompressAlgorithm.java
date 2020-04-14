@@ -48,12 +48,15 @@ public class CopyCompressAlgorithm extends AbstractCompressionAlgorithm {
       // add two headers and contentlength = commandlength+1
       final byte[] out = new byte[2 + contentLength];
       writeExtendedHeader(out, commandLength);
+      System.arraycopy(input, 0, out, 2, contentLength);
 
       return out;
     }
 
     // one header + contentlength
     final byte[] out = new byte[1 + contentLength];
+    out[0] = (byte) (commandLength & 0xFF);
+    System.arraycopy(input, 0, out, 1, contentLength);
 
     return out;
   }
