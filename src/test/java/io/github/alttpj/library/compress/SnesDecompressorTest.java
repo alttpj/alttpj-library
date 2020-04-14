@@ -19,26 +19,30 @@ package io.github.alttpj.library.compress;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class SnesDecompressorTest {
 
-  @Test
-  void testDecompression() throws IOException {
-    final byte[] decompressed;
-    try (
-        final InputStream oneUpStream = this.getClass().getResourceAsStream("/gfx/1up.bin");
-        final SnesDecompressor snesD = new SnesDecompressor(oneUpStream)) {
-      decompressed = snesD.getDecompressed();
-    }
+  private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
+  @ParameterizedTest
+  @ValueSource(strings = {"1up", "coin"})
+  void testDecompression(final String gfx) throws IOException {
     final byte[] expected;
     try (
-        final InputStream oneUpStream = this.getClass().getResourceAsStream("/gfx/u_1up.bin")) {
+        final InputStream oneUpStream = this.getClass().getResourceAsStream("/gfx/u_" + gfx + ".bin")) {
       final byte[] buffer = new byte[2048];
       final int readCount = oneUpStream.read(buffer, 0, buffer.length);
       expected = new byte[readCount];
       System.arraycopy(buffer, 0, expected, 0, readCount);
+    }
+
+    final byte[] decompressed;
+    try (
+        final InputStream oneUpStream = this.getClass().getResourceAsStream("/gfx/" + gfx + ".bin");
+        final SnesDecompressor snesD = new SnesDecompressor(oneUpStream)) {
+      decompressed = snesD.getDecompressed();
     }
 
     Assertions.assertAll(

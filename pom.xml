@@ -18,47 +18,25 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://maven.apache.org/POM/4.0.0"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.github.alttpj.io.github.alttpj.library</groupId>
   <artifactId>alttpj-io.github.alttpj.library</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <release>${maven.compiler.release}</release>
-          </configuration>
-          <groupId>org.apache.maven.plugins</groupId>
-          <version>3.8.1</version>
-        </plugin>
+  <name>ALttP Java: io.github.alttpj.library</name>
 
-        <plugin>
-          <artifactId>maven-shade-plugin</artifactId>
-          <groupId>org.apache.maven.plugins</groupId>
-          <version>3.2.2</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-  <dependencies>
-    <dependency>
-      <artifactId>slf4j-api</artifactId>
-      <groupId>org.slf4j</groupId>
-      <scope>compile</scope>
-    </dependency>
+  <properties>
+    <!-- jdk needed -->
+    <java.version>8</java.version>
+    <!-- compile to -->
+    <jdk.version>11</jdk.version>
+    <maven.compiler.release>${java.version}</maven.compiler.release>
 
-    <dependency>
-      <artifactId>logback-classic</artifactId>
-      <groupId>ch.qos.logback</groupId>
-      <scope>runtime</scope>
-    </dependency>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 
-    <dependency>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <groupId>org.junit.jupiter</groupId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <!-- dependencies in the management section are not forced upon the child modules. -->
   <dependencyManagement>
     <dependencies>
       <!-- slf4j is an implementation-independent log framework. -->
@@ -86,27 +64,59 @@
         <version>5.6.2</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-params</artifactId>
+        <version>5.6.2</version>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
-  <groupId>io.github.alttpj.io.github.alttpj.library</groupId>
+  <dependencies>
+    <dependency>
+      <artifactId>slf4j-api</artifactId>
+      <groupId>org.slf4j</groupId>
+      <scope>compile</scope>
+    </dependency>
 
-  <modelVersion>4.0.0</modelVersion>
+    <dependency>
+      <artifactId>logback-classic</artifactId>
+      <groupId>ch.qos.logback</groupId>
+      <scope>runtime</scope>
+    </dependency>
 
-  <!-- dependencies in the management section are not forced upon the child modules. -->
-  <name>ALttP Java: io.github.alttpj.library</name>
+    <dependency>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
-  <properties>
-    <!-- jdk needed -->
-    <java.version>8</java.version>
-    <!-- compile to -->
-    <jdk.version>11</jdk.version>
-    <maven.compiler.release>${java.version}</maven.compiler.release>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <release>${maven.compiler.release}</release>
+          </configuration>
+          <groupId>org.apache.maven.plugins</groupId>
+          <version>3.8.1</version>
+        </plugin>
 
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
-
-  <version>1.0.0-SNAPSHOT</version>
+        <plugin>
+          <artifactId>maven-shade-plugin</artifactId>
+          <groupId>org.apache.maven.plugins</groupId>
+          <version>3.2.2</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>

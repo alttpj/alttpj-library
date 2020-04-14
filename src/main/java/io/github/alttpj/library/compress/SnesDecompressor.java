@@ -16,8 +16,10 @@
 
 package io.github.alttpj.library.compress;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +33,12 @@ public class SnesDecompressor implements AutoCloseable {
   /**
    * First half byte is the command.
    */
-  private static final int HEADER_MASK_COMMAND = 0b11110000;
+  private static final int HEADER_MASK_COMMAND = 0b11100000;
 
   /**
    * Second half is the length.
    */
-  private static final int HEADER_MASK_LEN = 0b00001111;
+  private static final int HEADER_MASK_LEN = 0b00011111;
 
   private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
   private final InputStream inputStream;
@@ -49,7 +51,7 @@ public class SnesDecompressor implements AutoCloseable {
    */
   private int pos;
   private boolean closed = false;
-  private byte[] decompressed = new byte[0];
+  private final ByteArrayOutputStream decompressed = new ByteArrayOutputStream();
   private boolean readFully = false;
 
   private static String toBinaryString(final int command) {
@@ -74,7 +76,7 @@ public class SnesDecompressor implements AutoCloseable {
 
   public byte[] getDecompressed() {
     ensureReadFully();
-    return this.decompressed;
+    return this.decompressed.toByteArray();
   }
 
   /**
@@ -89,14 +91,14 @@ public class SnesDecompressor implements AutoCloseable {
   private int read() throws IOException {
     final int read = this.inputStream.read();
     this.pos++;
-    final String hex = String.format(Locale.ENGLISH, "%2s", Integer.toHexString(read)).replace(' ', '0');
-    LOG.warn("read [{}] at [{}].", hex, this.pos);
+
     return read;
   }
 
   public int read(final byte[] outputBuffer, final int off, final int maxReadLength) throws IOException {
     final int read = this.inputStream.read(outputBuffer, off, maxReadLength);
     this.pos += read;
+
     return read;
   }
 
@@ -106,36 +108,44 @@ public class SnesDecompressor implements AutoCloseable {
     }
 
     final int header = read();
-    final int command = header & HEADER_MASK_COMMAND;
+
+    if ((header & 0xFF) == 0xFF) {
+      this.eos = true;
+      this.readFully = true;
+      return null;
+    }
+
+    final int command = (header & HEADER_MASK_COMMAND) >> 5;
     // always use one more byte.
     // note: overwrite this if command is 0b0111! Then this is the actual command!
     final int commandLength = (header & HEADER_MASK_LEN) + 1;
 
+    if ((header & HEADER_MASK_COMMAND) == HEADER_MASK_COMMAND) {
+      return readExtensionCommand(header);
+    }
+
+    return evaluateCommand(command, commandLength);
+  }
+
+  private byte[] evaluateCommand(final int command, final int commandLength) throws IOException {
     switch (command) {
-      case 0b00000000:
-        return readCommand0(commandLength);
-      case 0b00010000:
-        LOG.warn("Command [{}] at position [{}].", command, this.pos);
-        break;
-      case 0b00100000:
-        return readCommand2(commandLength);
-      case 0b00110000:
-        LOG.warn("Command [{}] from header [{}] at position [{}].", toBinaryString(command), Integer.toHexString(header), this.pos);
-        return readCommand3(commandLength);
-      case 0b01000000:
-        return readCommand4(commandLength);
-      case 0b01110000:
-        throw new UnsupportedOperationException("Extension header");
+      case 0:
+        return readCommand0Copy(commandLength);
+      case 1:
+        return readCommand1RepeatByte(commandLength);
+      case 2:
+        return readCommand2RepeatWord(commandLength);
+      case 3:
+        return readCommand3IncreaseByte(commandLength);
+      case 4:
+        return readCommand4CopyExisting(commandLength);
       default:
         final String commandStr = toBinaryString(command);
         throw new UnsupportedOperationException("Unknown command: [" + commandStr + "].");
-
     }
-
-    throw new IllegalStateException("How did you get here?");
   }
 
-  protected byte[] readCommand0(final int commandLength) throws IOException {
+  protected byte[] readCommand0Copy(final int commandLength) throws IOException {
     if (LOG.isTraceEnabled()) {
       LOG.trace("Command 0 - Read the next n bytes as is");
     }
@@ -144,20 +154,14 @@ public class SnesDecompressor implements AutoCloseable {
     final int read = read(outputBuffer, 0, commandLength);
 
     if (read != commandLength) {
-      throw new IllegalStateException("Read [" + read + "] bytes when commoand was [" + commandLength + "]!");
+      throw new IllegalStateException("Read [" + read + "] bytes when command was [" + commandLength + "]!");
     }
 
     return outputBuffer;
   }
 
-  protected byte[] readCommand2(final int commandLength) throws IOException {
-    if (LOG.isTraceEnabled()) {
-      // doc says sth different.
-      LOG.trace("Command 2 - Copy next byte n times?");
-    }
-
+  protected byte[] readCommand1RepeatByte(final int commandLength) throws IOException {
     final int toDuplicate = read();
-
     final byte[] outputBuffer = new byte[commandLength];
 
     // copy all to output
@@ -168,17 +172,7 @@ public class SnesDecompressor implements AutoCloseable {
     return outputBuffer;
   }
 
-  private byte[] readCommand3(final int commandLength) {
-    LOG.warn("Len: [{}], Current: [{}]", Integer.toHexString(this.decompressed.length), bytesToHex(this.decompressed));
-
-    throw new UnsupportedOperationException("TODO: imlement");
-  }
-
-  /**
-   * Command 4: copy the next two bytes alternating to the output until length bytes have been copied.
-   */
-  protected byte[] readCommand4(final int commandLength) throws IOException {
-    // Command 4
+  protected byte[] readCommand2RepeatWord(final int commandLength) throws IOException {
     // let the next byte of the input be A
     // let the byte of the input after A be B
     // A and B are copied (alternating, as in ABABABAB...) to the output until (length parameter + 1) bytes have been copied to the output
@@ -194,15 +188,63 @@ public class SnesDecompressor implements AutoCloseable {
     return output;
   }
 
+  protected byte[] readCommand3IncreaseByte(final int commandLength) throws IOException {
+    throw new UnsupportedOperationException("3");
+  }
+
+  /**
+   * Command 4: copy the next two bytes alternating to the output until length bytes have been copied.
+   * Acts as a ringbuffer if length exeeds current decompression output.
+   */
+  protected byte[] readCommand4CopyExisting(final int commandLength) throws IOException {
+    // Command 4
+    // A and B form an offset into the current output buffer (the bytes that have already been decompressed and copied to the output)
+    // let this offset be X
+    // X = A | ( B << 8 )
+    // (length parameter + 1) bytes are copied from within the current output buffer and appended to the end of the current output buffer
+    final byte[] currentOutputBuffer = this.decompressed.toByteArray();
+    final int lengthOutputBuffer = currentOutputBuffer.length;
+
+    final int a = read();
+    final int b = read();
+    final int x = a | (b << 8);
+
+    // read as ring buffer
+    if (x + commandLength > lengthOutputBuffer) {
+      final byte[] out = new byte[commandLength];
+      int read = 0;
+      int pos = x;
+
+      while (read < commandLength) {
+        out[read] = currentOutputBuffer[pos];
+        read++;
+        pos++;
+        if (pos >= lengthOutputBuffer) {
+          // back to start
+          pos = x;
+        }
+      }
+
+      return out;
+    }
+
+    return Arrays.copyOfRange(currentOutputBuffer, x, x + commandLength);
+  }
+
+  private byte[] readExtensionCommand(final int header) throws IOException {
+    final int command = (header & 0b00011100) >> 2;
+    final int extensionByte = read();
+    final int commandLength = (((header & 0b00000011) << 8) + extensionByte) + 1;
+
+    return evaluateCommand(command, commandLength);
+  }
+
   private void readFully() {
     try {
       byte[] buffer;
 
       while ((buffer = inflateNextCommand()) != null) {
-        final byte[] newDecompressed = new byte[this.decompressed.length + buffer.length];
-        System.arraycopy(this.decompressed, 0, newDecompressed, 0, this.decompressed.length);
-        System.arraycopy(buffer, 0, newDecompressed, this.decompressed.length, buffer.length);
-        this.decompressed = newDecompressed;
+        this.decompressed.write(buffer, 0, buffer.length);
       }
 
       this.readFully = true;

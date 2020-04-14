@@ -77,69 +77,6 @@ public class Alttp3bppImageReader extends ImageReader {
         super(originatingProvider);
     }
 
-    protected static void unpackRowOfBitplaneOfTile(final byte[] input,
-                                                    final int inputOffset,
-                                                    final byte[] output,
-                                                    final int outputOffset,
-                                                    final int bitplaneIndex) {
-        for (int pixelIndex = 0; pixelIndex < 8; pixelIndex++) {
-            final int BitIndex = 7 - pixelIndex;
-            final int bit = (input[inputOffset] >> BitIndex) & 1;
-            output[outputOffset + pixelIndex] |= (byte) (bit << bitplaneIndex);
-        }
-    }
-
-    protected static void unpackTile(final byte[] input,
-                                     final int inputOffset,
-                                     final byte[] output,
-                                     final int outputOffset,
-                                     final int[] rowIndices,
-                                     final int[] bitplaneIndices) {
-        for (int index = 0; index < rowIndices.length; index++) {
-            unpackRowOfBitplaneOfTile(input, inputOffset + index, output, outputOffset + rowIndices[index] * 8, bitplaneIndices[index]);
-        }
-    }
-
-    protected static void unpackTiles(final byte[] input,
-                                      final int inputOffset,
-                                      final byte[] output,
-                                      final int outputOffset,
-                                      final int tileCount,
-                                      final int bytesPerTile,
-                                      final int[] rowIndices,
-                                      final int[] bitplaneIndices) {
-        for (int index = 0; index < tileCount; index++) {
-            unpackTile(input,
-                inputOffset + bytesPerTile * index,
-                output,
-                outputOffset + BYTES_PER_TILE_UNPACKED * index,
-                rowIndices,
-                bitplaneIndices);
-        }
-    }
-
-    public static void unpack3bppTiles(final byte[] input,
-                                       final int inputOffset,
-                                       final byte[] output,
-                                       final int outputOffset,
-                                       final int tileCount) {
-        unpackTiles(input, inputOffset, output, outputOffset, tileCount, BYTES_PER_TILE_3BPP, ROW_INDICES_3BPP, BITPLANE_INDICES_3BPP);
-    }
-
-    protected static byte[] unpack3bppTiles(final byte[] input, final int tileCount) {
-        final int totalSize = tileCount * BYTES_PER_TILE_UNPACKED;
-        final byte[] buffer = new byte[totalSize];
-        unpack3bppTiles(input, 0, buffer, 0, tileCount);
-
-        return buffer;
-    }
-
-    public static byte[] unpack3bppTiles(final byte[] inputCompressed) {
-        final int tileCount = inputCompressed.length / BYTES_PER_TILE_3BPP;
-
-        return unpack3bppTiles(inputCompressed, tileCount);
-    }
-
     /**
      * Overrides the method defined in the superclass.
      */
@@ -259,4 +196,66 @@ public class Alttp3bppImageReader extends ImageReader {
         }
     }
 
+    protected static void unpackRowOfBitplaneOfTile(final byte[] input,
+                                                    final int inputOffset,
+                                                    final byte[] output,
+                                                    final int outputOffset,
+                                                    final int bitplaneIndex) {
+        for (int pixelIndex = 0; pixelIndex < 8; pixelIndex++) {
+            final int BitIndex = 7 - pixelIndex;
+            final int bit = (input[inputOffset] >> BitIndex) & 1;
+            output[outputOffset + pixelIndex] |= (byte) (bit << bitplaneIndex);
+        }
+    }
+
+    protected static void unpackTile(final byte[] input,
+                                     final int inputOffset,
+                                     final byte[] output,
+                                     final int outputOffset,
+                                     final int[] rowIndices,
+                                     final int[] bitplaneIndices) {
+        for (int index = 0; index < rowIndices.length; index++) {
+            unpackRowOfBitplaneOfTile(input, inputOffset + index, output, outputOffset + rowIndices[index] * 8, bitplaneIndices[index]);
+        }
+    }
+
+    protected static void unpackTiles(final byte[] input,
+                                      final int inputOffset,
+                                      final byte[] output,
+                                      final int outputOffset,
+                                      final int tileCount,
+                                      final int bytesPerTile,
+                                      final int[] rowIndices,
+                                      final int[] bitplaneIndices) {
+        for (int index = 0; index < tileCount; index++) {
+            unpackTile(input,
+                inputOffset + bytesPerTile * index,
+                output,
+                outputOffset + BYTES_PER_TILE_UNPACKED * index,
+                rowIndices,
+                bitplaneIndices);
+        }
+    }
+
+    public static void unpack3bppTiles(final byte[] input,
+                                       final int inputOffset,
+                                       final byte[] output,
+                                       final int outputOffset,
+                                       final int tileCount) {
+        unpackTiles(input, inputOffset, output, outputOffset, tileCount, BYTES_PER_TILE_3BPP, ROW_INDICES_3BPP, BITPLANE_INDICES_3BPP);
+    }
+
+    protected static byte[] unpack3bppTiles(final byte[] input, final int tileCount) {
+        final int totalSize = tileCount * BYTES_PER_TILE_UNPACKED;
+        final byte[] buffer = new byte[totalSize];
+        unpack3bppTiles(input, 0, buffer, 0, tileCount);
+
+        return buffer;
+    }
+
+    public static byte[] unpack3bppTiles(final byte[] inputCompressed) {
+        final int tileCount = inputCompressed.length / BYTES_PER_TILE_3BPP;
+
+        return unpack3bppTiles(inputCompressed, tileCount);
+    }
 }
