@@ -24,10 +24,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 public class SnesDecompressorTest {
 
-  private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
-
   @ParameterizedTest
-  @ValueSource(strings = {"1up", "coin"})
+  @ValueSource(strings = {"1up", "coin", "meat", "yoshi"})
   void testDecompression(final String gfx) throws IOException {
     final byte[] expected;
     try (

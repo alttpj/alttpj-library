@@ -188,8 +188,24 @@ public class SnesDecompressor implements AutoCloseable {
     return output;
   }
 
+  /**
+   * Read a byte copy it n times to the output buffer (like c1), but incrementing after each copy.
+   *
+   * @param commandLength
+   *     the number of expected output bytes.
+   * @return the uncompressed byte array.
+   * @throws IOException
+   *     error reading the next byte from the stream.
+   */
   protected byte[] readCommand3IncreaseByte(final int commandLength) throws IOException {
-    throw new UnsupportedOperationException("3");
+    int increment = read();
+    final byte[] out = new byte[commandLength];
+
+    for (int ii = 0; ii < commandLength; ii++) {
+      out[ii] = (byte) increment++;
+    }
+
+    return out;
   }
 
   /**
