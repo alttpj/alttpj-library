@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package io.github.alttpj.library.image;
+package io.github.alttpj.library.compress;
 
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.metadata.IIOMetadataFormatImpl;
+public final class CompressorConstants {
 
-public class Alttp3bppImageFormat extends IIOMetadataFormatImpl {
+  public static final int COMMAND_LENGTH_MAX_NORMAL = 0b11111; /* 31 */
 
-    public Alttp3bppImageFormat() {
-        super("alttp_3bpp_1.0", CHILD_POLICY_EMPTY);
-    }
+  public static final int COMMAND_LENGTH_MAX_EXTENDED = 0b11_11111111; /* 1023 */
 
-    @Override
-    public boolean canNodeAppear(final String elementName, final ImageTypeSpecifier imageType) {
-        return false;
-    }
 }

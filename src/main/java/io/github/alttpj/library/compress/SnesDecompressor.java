@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-${YEAR} the ALttPJ Team @ https://github.com/alttpj
+ * Copyright 2020-2020 the ALttPJ Team @ https://github.com/alttpj
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@ public class SnesDecompressor implements AutoCloseable {
 
   private static final Logger LOG = LoggerFactory.getLogger(SnesDecompressor.class);
 
-  private static final int BUFFER_SIZE = 512;
-
   /**
    * First half byte is the command.
    */
@@ -40,7 +38,6 @@ public class SnesDecompressor implements AutoCloseable {
    */
   private static final int HEADER_MASK_LEN = 0b00011111;
 
-  private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
   private final InputStream inputStream;
   /**
    * Indicates end of input stream.
@@ -62,17 +59,6 @@ public class SnesDecompressor implements AutoCloseable {
   public SnesDecompressor(final InputStream inputStream) {
     this.inputStream = inputStream;
   }
-
-  public static String bytesToHex(final byte[] bytes) {
-    final char[] hexChars = new char[bytes.length * 2];
-    for (int j = 0; j < bytes.length; j++) {
-      final int v = bytes[j] & 0xFF;
-      hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-      hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-    }
-    return new String(hexChars);
-  }
-
 
   public byte[] getDecompressed() {
     ensureReadFully();
