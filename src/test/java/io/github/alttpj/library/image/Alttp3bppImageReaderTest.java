@@ -23,22 +23,38 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import org.junit.jupiter.api.Test;
 
 class Alttp3bppImageReaderTest {
 
     @Test
     void testUnpack3bppTiles() throws IOException {
-        final InputStream oneUpStream = this.getClass().getResourceAsStream("/gfx/1up.bin");
-        final byte[] inputCompressed = readAllBytes(oneUpStream);
+        final InputStream oneUpPackedUncompressedStream = this.getClass().getResourceAsStream("/gfx/u_1up.bin");
+        final byte[] inputPacked = readAllBytes(oneUpPackedUncompressedStream);
 
-        final byte[] unpacked = Alttp3bppImageReader.unpack3bppTiles(inputCompressed);
+        final byte[] unpacked = Alttp3bppImageReader.unpack3bppTiles(inputPacked);
         final byte[] onUpExpected = readAllBytes(this.getClass().getResourceAsStream("/gfx/u_1up.bin"));
 
         assertAll(
             () -> assertEquals(0x5ff + 1, unpacked.length),
             () -> assertArrayEquals(onUpExpected, unpacked)
         );
+    }
+
+    @Test
+    public void testUncompress() throws IOException {
+        final InputStream oneUpPackedCompressedStream = this.getClass().getResourceAsStream("/gfx/1up.bin");
+        final ImageInputStream imageInputStream = ImageIO.createImageInputStream(oneUpPackedCompressedStream);
+
+        // when
+        final byte[] uncompressedPacked = Alttp3bppImageReader.readCompressedImage(imageInputStream);
+
+        // then
+        final byte[] expected = readAllBytes(this.getClass().getResourceAsStream("/gfx/u_1up.bin"));
+        assertArrayEquals(expected, uncompressedPacked);
+
     }
 
     private byte[] readAllBytes(final InputStream oneUpStream) throws IOException {

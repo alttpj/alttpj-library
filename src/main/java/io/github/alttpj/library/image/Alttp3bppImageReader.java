@@ -16,10 +16,15 @@
 
 package io.github.alttpj.library.image;
 
+import io.github.alttpj.library.compress.SnesDecompressor;
 import io.github.alttpj.library.i18n.I18N;
+import io.github.alttpj.library.image.palette.Palette3bpp;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteOrder;
 import java.util.Iterator;
 import javax.imageio.ImageReadParam;
@@ -95,7 +100,7 @@ public class Alttp3bppImageReader extends ImageReader {
 
     private void checkIndex(final int imageIndex) {
         if (imageIndex != 0) {
-            throw new IndexOutOfBoundsException(I18N.getString("Alttp3bppImageReader0"));
+            throw new IndexOutOfBoundsException(I18N.getString("IndexNotZero"));
         }
     }
 
@@ -120,7 +125,7 @@ public class Alttp3bppImageReader extends ImageReader {
             throw new IllegalStateException(I18N.getString("InputStreamNull"));
         }
 
-        return 8;
+        return 16;
     }
 
     // implementation
@@ -133,7 +138,7 @@ public class Alttp3bppImageReader extends ImageReader {
             throw new IllegalStateException(I18N.getString("InputStreamNull"));
         }
 
-        return 8;
+        return 16;
     }
 
     @Override
@@ -167,32 +172,47 @@ public class Alttp3bppImageReader extends ImageReader {
         }
 
         // unpack
-        final byte[] readInput = readCompressedImage();
+        final byte[] readInput = readCompressedImage(this.iis);
 
-        final byte[] uncompressedOut = unpack3bppTiles(readInput, 1);
+        final byte[] uncompressedOut = unpack3bppTiles(readInput);
 
         final int height = getHeight(imageIndex);
         final int width = getWidth(imageIndex);
-        this.bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        for (int i = 0; i < height; i++) {
+        this.bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final WritableRaster raster = this.bi.getRaster();
+
+        for (int x = 0; x < 8; x++) {
             if (abortRequested()) {
                 break;
+            }
+            for (int y = 0; y < 8; y++) {
+                if (abortRequested()) {
+                    break;
+                }
+
+                final byte byteForXY = uncompressedOut[x * 8 + y];
+                final int[] color = Palette3bpp.GREEN.getColor(byteForXY);
+
+                raster.setPixel(x, y, color);
             }
         }
 
         return this.bi;
     }
 
-    private byte[] readCompressedImage() throws IOException {
-        try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            final byte[] buffer = new byte[BUFFER_SIZE];
-            int numRead;
+    protected static byte[] readCompressedImage(final ImageInputStream imageInputStream) throws IOException {
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        final byte[] buffer = new byte[BUFFER_SIZE];
+        int read;
 
-            while ((numRead = this.iis.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, numRead);
-            }
+        while ((read = imageInputStream.read(buffer)) != -1) {
+            os.write(buffer, 0, read);
+        }
 
-            return byteArrayOutputStream.toByteArray();
+        final InputStream fis = new ByteArrayInputStream(os.toByteArray());
+
+        try (final SnesDecompressor snesDecompressor = new SnesDecompressor(fis)) {
+            return snesDecompressor.getDecompressed();
         }
     }
 
@@ -253,9 +273,9 @@ public class Alttp3bppImageReader extends ImageReader {
         return buffer;
     }
 
-    public static byte[] unpack3bppTiles(final byte[] inputCompressed) {
-        final int tileCount = inputCompressed.length / BYTES_PER_TILE_3BPP;
+    public static byte[] unpack3bppTiles(final byte[] inputPackedUncompressed) {
+        final int tileCount = inputPackedUncompressed.length / BYTES_PER_TILE_3BPP;
 
-        return unpack3bppTiles(inputCompressed, tileCount);
+        return unpack3bppTiles(inputPackedUncompressed, tileCount);
     }
 }
