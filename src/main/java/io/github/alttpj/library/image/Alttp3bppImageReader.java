@@ -174,18 +174,18 @@ public class Alttp3bppImageReader extends ImageReader {
         // unpack
         final byte[] readInput = readCompressedImage(this.iis);
 
-        final byte[] uncompressedOut = unpack3bppTiles(readInput);
+        final byte[] uncompressedOut = unpack3bppTiles(readInput, 4);
 
         final int height = getHeight(imageIndex);
         final int width = getWidth(imageIndex);
         this.bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         final WritableRaster raster = this.bi.getRaster();
 
-        for (int x = 0; x < 8; x++) {
+        for (int x = 0; x < width; x++) {
             if (abortRequested()) {
                 break;
             }
-            for (int y = 0; y < 8; y++) {
+            for (int y = 0; y < height; y++) {
                 if (abortRequested()) {
                     break;
                 }
