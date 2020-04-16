@@ -29,10 +29,10 @@ public class Palette3bpp {
     greenLookup[0][2] = 150;
     greenLookup[0][3] = 255;
 
-    // 0b001: dark grey
-    greenLookup[1][0] = 50;
-    greenLookup[1][1] = 50;
-    greenLookup[1][2] = 50;
+    // 0b001: white // FIX
+    greenLookup[1][0] = 255;
+    greenLookup[1][1] = 255;
+    greenLookup[1][2] = 255;
     greenLookup[1][3] = 255;
 
     // 0b001: light grey
@@ -41,10 +41,10 @@ public class Palette3bpp {
     greenLookup[2][2] = 150;
     greenLookup[2][3] = 255;
 
-    // 0b011: light green
-    greenLookup[3][0] = 100;
-    greenLookup[3][1] = 255;
-    greenLookup[3][2] = 100;
+    // 0b011: dark green // fix
+    greenLookup[3][0] = 0;
+    greenLookup[3][1] = 150;
+    greenLookup[3][2] = 0;
     greenLookup[3][3] = 255;
 
     // 0b100: green
@@ -53,10 +53,10 @@ public class Palette3bpp {
     greenLookup[4][2] = 0;
     greenLookup[4][3] = 255;
 
-    // 0b101: blue
+    // 0b101: black // FIX
     greenLookup[5][0] = 0;
     greenLookup[5][1] = 0;
-    greenLookup[5][2] = 255;
+    greenLookup[5][2] = 0;
     greenLookup[5][3] = 255;
 
     // 0b110: light blue

@@ -33,8 +33,12 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Alttp3bppImageReader extends ImageReader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Alttp3bppImageReader.class);
 
     private static final int BUFFER_SIZE = 512;
 
@@ -125,7 +129,7 @@ public class Alttp3bppImageReader extends ImageReader {
             throw new IllegalStateException(I18N.getString("InputStreamNull"));
         }
 
-        return 16;
+        return 128;
     }
 
     // implementation
@@ -138,7 +142,7 @@ public class Alttp3bppImageReader extends ImageReader {
             throw new IllegalStateException(I18N.getString("InputStreamNull"));
         }
 
-        return 16;
+        return 32;
     }
 
     @Override
@@ -174,30 +178,58 @@ public class Alttp3bppImageReader extends ImageReader {
         // unpack
         final byte[] readInput = readCompressedImage(this.iis);
 
-        final byte[] uncompressedOut = unpack3bppTiles(readInput, 4);
+        final int tileCount = 64;
+        final byte[] uncompressedOut = unpack3bppTiles(readInput, tileCount);
+        final byte[] rasterPaletteData = new byte[4096];
+        System.arraycopy(uncompressedOut, 0, rasterPaletteData, 0, tileCount * 64);
 
         final int height = getHeight(imageIndex);
         final int width = getWidth(imageIndex);
         this.bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         final WritableRaster raster = this.bi.getRaster();
 
-        for (int x = 0; x < width; x++) {
-            if (abortRequested()) {
-                break;
-            }
-            for (int y = 0; y < height; y++) {
+        // write across each time, but is reset after a line of tiles.
+        // therefore the Y counter is outwards.
+        // tiles are always 8x8, so there will be width/8 + height/8 tiles in an image
+        for (int tileY = 0; tileY < height / 8; tileY++) {
+            // then for each 8x8 tile downwards.
+            for (int tileX = 0; tileX < width / 8; tileX++) {
                 if (abortRequested()) {
                     break;
                 }
-
-                final byte byteForXY = uncompressedOut[x * 8 + y];
-                final int[] color = Palette3bpp.GREEN.getColor(byteForXY);
-
-                raster.setPixel(x, y, color);
+                LOG.info("Tile #[{}]. Xstart: [{}]. YStart: [{}].", tileX + 1 + tileY * width / 8, tileX * 8, tileY * 8);
+                drawTile(rasterPaletteData, raster, tileX, tileY, width);
+                if (abortRequested()) {
+                    break;
+                }
             }
         }
 
         return this.bi;
+    }
+
+    private void drawTile(final byte[] uncompressedOut, final WritableRaster raster, final int tileX, final int tileY, final int width) {
+        for (int y = 0; y < 8; y++) {
+            final int xOffsetRaster = tileX * 8;
+            if (abortRequested()) {
+                break;
+            }
+            for (int x = 0; x < 8; x++) {
+                final int yOffsetRaster = tileY * 8;
+
+                if (abortRequested()) {
+                    break;
+                }
+
+                final int arrayTileOffset = xOffsetRaster * 8 + yOffsetRaster * width;
+                final int posInDataArray = arrayTileOffset + x + y * 8;
+                final byte byteForXY = uncompressedOut[posInDataArray];
+                final int[] color = Palette3bpp.GREEN.getColor(byteForXY);
+
+                LOG.info("read offset [{}], written to [{}]/[{}].", posInDataArray, x + xOffsetRaster, y + yOffsetRaster);
+                raster.setPixel(x + xOffsetRaster, y + yOffsetRaster, color);
+            }
+        }
     }
 
     protected static byte[] readCompressedImage(final ImageInputStream imageInputStream) throws IOException {

@@ -1,0 +1,49 @@
+= ALttPJ - a java library for Zelda 3: A Link To The Past Rom manipulation
+
+Common Library Functions such as Sprite to Image conversion, compression, etc.
+This is useful if you are developing a ROM tool and need to:
+
+* Convert PNG Images to sprites to include them into the game.
+* Convert sprites to PNG images for a preview.
+* Read uncompressed data
+* Compress data for inclusion into the game
+
+== How to use
+
+Maven repository will be set up later.
+
+Coordinates will be:
+
+[source,xml]
+----
+<!-- https://github.com/alttpj/alttpj-librar -->
+<dependency>
+  <groupId>io.github.alttpj.io.github.alttpj.library</groupId>
+  <artifactId>alttpj-io.github.alttpj.library</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</dependency>
+----
+
+The root package is: `io.github.alttpj.library`
+
+=== Compression
+
+`SnesCompressor`-- compression
+`SnesDecompressor`-- decompression
+
+=== Image manipulation
+
+Use ImageIO (tbd). `.zspr` files will be supported later on.
+Current state: Read images with the green palette which are 128x32.
+
+== Dependencies
+
+None.
+This project will get rid even of the `slf4j` dependency once "finished".
+
+== Roadmap
+
+Things which need to be done:
+
+* (Maybe) Use imageIndex for the tiles in Alttp3bppImageReader
+* Add more formats, e.g. one format which includes the palette index.

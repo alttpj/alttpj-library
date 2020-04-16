@@ -31,7 +31,7 @@ public class TestUI {
   public static void main(final String[] args) throws IOException, InterruptedException {
     final BufferedImage bufferedImage = ImageIO.read(Alttp3bppImageReaderTest.class.getResourceAsStream("/gfx/1up.bin"));
     final Image scaledInstance = bufferedImage
-        .getScaledInstance(bufferedImage.getWidth() * 8, bufferedImage.getHeight() * 8, Image.SCALE_AREA_AVERAGING);
+        .getScaledInstance(bufferedImage.getWidth() * 4, bufferedImage.getHeight() * 4, Image.SCALE_AREA_AVERAGING);
 
     final JFrame frame = new JFrame("Test window");
     frame.setMinimumSize(new Dimension(256, 256));
