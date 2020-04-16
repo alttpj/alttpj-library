@@ -1,5 +1,7 @@
 = ALttPJ - a java library for Zelda 3: A Link To The Past Rom manipulation
 
+image::https://www.travis-ci.com/alttpj/alttpj-library.svg?branch=master[travis-ci.com]
+
 Common Library Functions such as Sprite to Image conversion, compression, etc.
 This is useful if you are developing a ROM tool and need to:
 

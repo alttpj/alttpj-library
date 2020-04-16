@@ -17,7 +17,7 @@ Pay attention to checkstyle checks, tests and
 
 * Your code *must* have code coverage on new and important routines.
 * Your code *must* pass the checkstyle and enforcer validation.
-* You *must* have run `mvn clean verify -Pintegration-tests` before creating the pull request.
+* You *must* have run `mvn clean verify -Pdocs,integration-tests` before creating the pull request.
 * You *must* license the code under Apache License v2.0.
 
 == How to develop

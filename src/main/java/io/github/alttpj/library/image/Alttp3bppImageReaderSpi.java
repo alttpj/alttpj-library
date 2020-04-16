@@ -30,8 +30,7 @@ public class Alttp3bppImageReaderSpi extends ImageReaderSpi {
 
   private static final Logger LOG = LoggerFactory.getLogger(Alttp3bppImageReaderSpi.class);
 
-  private static final String[] WRITER_SPI_NAMES =
-      {"com.sun.imageio.plugins.bmp.BMPImageWriterSpi"};
+  private static final String[] WRITER_SPI_NAMES = {"com.sun.imageio.plugins.bmp.BMPImageWriterSpi"};
   private static final String[] FORMAT_NAMES = {"3bpp", "3bp"};
   private static final String[] EXTENSIONS = {"3bpp"};
   private static final String[] MIME_TYPE = {"image/3bpp"};

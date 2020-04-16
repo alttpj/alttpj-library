@@ -16,16 +16,20 @@
 
 package io.github.alttpj.library.image;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 class Alttp3bppImageReaderTest {
@@ -53,7 +57,25 @@ class Alttp3bppImageReaderTest {
         // then
         final byte[] expected = readAllBytes(this.getClass().getResourceAsStream("/gfx/u_1up.bin"));
         assertArrayEquals(expected, uncompressedPacked);
+    }
 
+    @Test
+    void testCanCreateBufferedImage() throws IOException {
+        // given
+        // must be invoked directly.
+        final ImageReader imageReader = new Alttp3bppImageReaderSpi().createReaderInstance(null);
+        final InputStream oneUpPackedCompressedStream = this.getClass().getResourceAsStream("/gfx/1up.bin");
+        final ImageInputStream imageInputStream = ImageIO.createImageInputStream(oneUpPackedCompressedStream);
+        imageReader.setInput(imageInputStream);
+
+        // when
+        final BufferedImage bufferedImage = imageReader.read(0);
+
+        // then
+        assertAll(
+            () -> assertThat(bufferedImage.getHeight(), is(32)),
+            () -> assertThat(bufferedImage.getWidth(), is(128))
+        );
     }
 
     private byte[] readAllBytes(final InputStream oneUpStream) throws IOException {
