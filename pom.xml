@@ -385,6 +385,16 @@
 
   <inceptionYear>2020</inceptionYear>
 
+  <scm>
+    <connection>scm:git:https://github.com:alttpj/alttpj-library.git</connection>
+    <developerConnection>scm:git:https://github.com:alttpj/alttpj-library.git</developerConnection>
+  </scm>
+
+  <ciManagement>
+    <system>Travis-CI.com</system>
+    <url>https://www.travis-ci.com/github/alttpj/alttpj-library/</url>
+  </ciManagement>
+
   <issueManagement>
     <url>https://github.com/alttpj/alttpj-library/issues</url>
     <system>GitHub</system>
