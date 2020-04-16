@@ -20,6 +20,7 @@ import static io.github.alttpj.library.compress.CompressorConstants.COMMAND_LENG
 import static io.github.alttpj.library.compress.CompressorConstants.COMMAND_LENGTH_MAX_NORMAL;
 
 import io.github.alttpj.library.compress.CompressionAlgorithm;
+
 import java.util.StringJoiner;
 
 public class CopyExistingCompressionAlgorithm extends AbstractCompressionAlgorithm implements CompressionAlgorithm {
@@ -28,7 +29,7 @@ public class CopyExistingCompressionAlgorithm extends AbstractCompressionAlgorit
   /**
    * Found if longestSubArray if > 0.
    */
-  private int longestSubArray = 0;
+  private int longestSubArray;
 
   public CopyExistingCompressionAlgorithm() {
     super(4);
@@ -65,7 +66,7 @@ public class CopyExistingCompressionAlgorithm extends AbstractCompressionAlgorit
     return Math.min(input.length, COMMAND_LENGTH_MAX_EXTENDED + 1);
   }
 
-  private int findAinB(byte[] search, final RingBuffer alreadyProcessedUncompressed, final byte[] originalInput, int max) {
+  private int findAinB(final byte[] search, final RingBuffer alreadyProcessedUncompressed, final byte[] originalInput, final int max) {
     //LOG.info("Trying to find [{}] matching bytes.", search.length);
 
     final int lastIndexToStartComparing = alreadyProcessedUncompressed.size();
@@ -98,22 +99,22 @@ public class CopyExistingCompressionAlgorithm extends AbstractCompressionAlgorit
       }
 
       // see if we can find the bigger array.
-      search = new byte[newLength];
-      System.arraycopy(originalInput, 0, search, 0, search.length);
-      return findAinB(search, alreadyProcessedUncompressed, originalInput, max);
+      final byte[] newSearch = new byte[newLength];
+      System.arraycopy(originalInput, 0, newSearch, 0, newLength);
+      return findAinB(newSearch, alreadyProcessedUncompressed, originalInput, max);
     }
 
     // (2)
-    max = search.length;
-    search = new byte[search.length / 2];
-    if (search.length <= 4) {
+    final int newMax = search.length;
+    final byte[] newSearch = new byte[search.length / 2];
+    if (newSearch.length <= 4) {
       // no smaller size possible.
       return this.longestSubArray;
     }
 
-    System.arraycopy(originalInput, 0, search, 0, search.length);
+    System.arraycopy(originalInput, 0, newSearch, 0, newSearch.length);
 
-    return findAinB(search, alreadyProcessedUncompressed, originalInput, max);
+    return findAinB(newSearch, alreadyProcessedUncompressed, originalInput, newMax);
   }
 
   public int getPosInUncompressed() {
@@ -155,17 +156,6 @@ public class CopyExistingCompressionAlgorithm extends AbstractCompressionAlgorit
     out[1] = (byte) ((this.posInUncompressed >> 8) & 0xFF);
 
     return out;
-  }
-
-  static String toBinaryString(final byte[] in) {
-    final StringBuffer sb = new StringBuffer();
-    for (final byte b : in) {
-      final String str = String.format("%8s", Integer.toBinaryString(b & 0xFF)).replaceAll(" ", "0");
-      sb.append(str);
-      sb.append(' ');
-    }
-
-    return sb.toString();
   }
 
   @Override

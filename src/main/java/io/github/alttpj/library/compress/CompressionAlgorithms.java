@@ -21,6 +21,7 @@ import io.github.alttpj.library.compress.impl.CopyExistingCompressionAlgorithm;
 import io.github.alttpj.library.compress.impl.IncrementByteCompressionAlgorithm;
 import io.github.alttpj.library.compress.impl.RepeatByteCompressionAlgorithm;
 import io.github.alttpj.library.compress.impl.RepeatWordCompressionAlgorithm;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.StringJoiner;
 

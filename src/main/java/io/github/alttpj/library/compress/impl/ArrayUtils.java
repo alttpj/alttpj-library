@@ -22,21 +22,21 @@ final class ArrayUtils {
     // util class.
   }
 
-  public static boolean equals(final byte[] a, final int aFromIndex, final int aToIndex,
-                               final byte[] b, final int bFromIndex, final int bToIndex) {
-    rangeCheck(a.length, aFromIndex, aToIndex);
-    rangeCheck(b.length, bFromIndex, bToIndex);
+  public static boolean equals(final byte[] firstArray, final int faFromIndex, final int faToIndex,
+                               final byte[] secondArray, final int saFromIndex, final int saToIndex) {
+    rangeCheck(firstArray.length, faFromIndex, faToIndex);
+    rangeCheck(secondArray.length, saFromIndex, saToIndex);
 
-    final int aLength = aToIndex - aFromIndex;
-    final int bLength = bToIndex - bFromIndex;
+    final int aLength = faToIndex - faFromIndex;
+    final int bLength = saToIndex - saFromIndex;
     if (aLength != bLength) {
       return false;
     }
 
     final byte[] aSub = new byte[aLength];
     final byte[] bSub = new byte[bLength];
-    System.arraycopy(a, aFromIndex, aSub, 0, aLength);
-    System.arraycopy(b, bFromIndex, bSub, 0, bLength);
+    System.arraycopy(firstArray, faFromIndex, aSub, 0, aLength);
+    System.arraycopy(secondArray, saFromIndex, bSub, 0, bLength);
 
     for (int ii = 0; ii < aSub.length; ii++) {
       if (aSub[ii] != bSub[ii]) {

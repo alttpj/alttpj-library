@@ -13,6 +13,13 @@ Pay attention to checkstyle checks, tests and
 . Commit and push
 . Create pull request.
 
+== Commit and PR rules
+
+* Your code *must* have code coverage on new and important routines.
+* Your code *must* pass the checkstyle and enforcer validation.
+* You *must* have run `mvn clean verify -Pintegration-tests` before creating the pull request.
+* You *must* license the code under Apache License v2.0.
+
 == How to develop
 
 * Make sure your IDE picks up the checkstyle rules from `build/checkstyle.xml`.
@@ -21,11 +28,19 @@ Pay attention to checkstyle checks, tests and
 * Do not use `else`.
 If you encounter an else, refactor out into a method which does this: +
 
-```java
-if (special condition) {
-  return
-};
-normallogic;
-return;
-``
+[source,java]
+----
+class SomeClass {
+  void method() {
+    if (false /*special condition*/) {
+      specialLogic();
+
+      return;
+    }
+
+    // always execute 'normal' logic without indentation.
+    normalLogic();
+  }
+}
+----
 

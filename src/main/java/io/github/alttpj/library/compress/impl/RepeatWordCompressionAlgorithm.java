@@ -20,6 +20,7 @@ import static io.github.alttpj.library.compress.CompressorConstants.COMMAND_LENG
 import static io.github.alttpj.library.compress.CompressorConstants.COMMAND_LENGTH_MAX_NORMAL;
 
 import io.github.alttpj.library.compress.CompressionAlgorithm;
+
 import java.util.StringJoiner;
 
 public class RepeatWordCompressionAlgorithm extends AbstractCompressionAlgorithm implements CompressionAlgorithm {

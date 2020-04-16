@@ -23,4 +23,8 @@ public final class CompressorConstants {
   public static final int COMMAND_LENGTH_MAX_EXTENDED = 0b11_11111111; /* 1023 */
 
   public static final byte ENF_OF_COMPRESSED_STREAM = (byte) 0xff;
+
+  private CompressorConstants() {
+    // util class.
+  }
 }

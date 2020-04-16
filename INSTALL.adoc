@@ -6,6 +6,11 @@ This file includes instructions on how to compile and install this library.
 
 * Java SDK version 11 or higher.
 
+I can highly recommend link:https://github.com/shyiko/jabba[Jabba] for downloading and/or managing your java version.
+
+You can also add the JDKs into your link:https://maven.apache.org/guides/mini/guide-using-toolchains.html[Toolchain file]
+if you do not want to switch back and forth between JDKs.
+
 *Note*: This is just a compile time dependency.
 The bytecode will be Java 8 compatible due to the use of the `-release=8` switch.
 

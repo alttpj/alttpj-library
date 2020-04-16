@@ -19,6 +19,7 @@ package io.github.alttpj.library.compress.impl;
 import static io.github.alttpj.library.compress.CompressorConstants.COMMAND_LENGTH_MAX_EXTENDED;
 
 import io.github.alttpj.library.compress.CompressionAlgorithm;
+
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -61,7 +62,7 @@ abstract class AbstractCompressionAlgorithm implements CompressionAlgorithm {
 
     // use the bits 0011_0000 from the commandLength int and use them as 0000_0011;
     //     out[1] = (byte) ((this.posInUncompressed >> 8) & 0xFF);
-    int headerByte = ((byte) (commandLength >> 8 & 0xFF));
+    int headerByte = (byte) (commandLength >> 8 & 0xFF);
     // nudge the commandNum to position 0001_11000.
     headerByte = headerByte | (getCommandNum() << 2);
     // set first three bits to 111 to indicate extended header

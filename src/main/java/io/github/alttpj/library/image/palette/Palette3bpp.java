@@ -16,65 +16,34 @@
 
 package io.github.alttpj.library.image.palette;
 
-public class Palette3bpp {
+public final class Palette3bpp {
 
   public static final Palette GREEN = createGreen();
-  private static final int[][] lookupGreen = createGreenLookup();
 
-  private static int[][] createGreenLookup() {
-    final int[][] greenLookup = new int[8][4];
-    // 0b000: light grey
-    greenLookup[0][0] = 150;
-    greenLookup[0][1] = 150;
-    greenLookup[0][2] = 150;
-    greenLookup[0][3] = 255;
+  private static final int[][] GREEN_LOOKUP = new int[][] {
+      // 0b000: light grey
+      new int[] {150, 150, 150, 255},
+      // 0b001: white // FIX
+      new int[] {255, 255, 255, 255},
+      // 0b001: light grey
+      new int[] {150, 150, 150, 255},
+      // 0b011: dark green // fix
+      new int[] {0, 150, 0, 255},
+      // 0b100: green
+      new int[] {0, 255, 0, 255},
+      // 0b101: black // FIX
+      new int[] {0, 0, 0, 255},
+      // 0b110: light blue
+      new int[] {100, 100, 255, 255},
+      // 0b111: black
+      new int[] {0, 0, 0, 255}
+  };
 
-    // 0b001: white // FIX
-    greenLookup[1][0] = 255;
-    greenLookup[1][1] = 255;
-    greenLookup[1][2] = 255;
-    greenLookup[1][3] = 255;
-
-    // 0b001: light grey
-    greenLookup[2][0] = 150;
-    greenLookup[2][1] = 150;
-    greenLookup[2][2] = 150;
-    greenLookup[2][3] = 255;
-
-    // 0b011: dark green // fix
-    greenLookup[3][0] = 0;
-    greenLookup[3][1] = 150;
-    greenLookup[3][2] = 0;
-    greenLookup[3][3] = 255;
-
-    // 0b100: green
-    greenLookup[4][0] = 0;
-    greenLookup[4][1] = 255;
-    greenLookup[4][2] = 0;
-    greenLookup[4][3] = 255;
-
-    // 0b101: black // FIX
-    greenLookup[5][0] = 0;
-    greenLookup[5][1] = 0;
-    greenLookup[5][2] = 0;
-    greenLookup[5][3] = 255;
-
-    // 0b110: light blue
-    greenLookup[6][0] = 100;
-    greenLookup[6][1] = 100;
-    greenLookup[6][2] = 255;
-    greenLookup[6][3] = 255;
-
-    // 0b111: black
-    greenLookup[7][0] = 0;
-    greenLookup[7][1] = 0;
-    greenLookup[7][2] = 0;
-    greenLookup[7][3] = 255;
-
-    return greenLookup;
+  private Palette3bpp() {
+    // util class.
   }
 
   private static Palette createGreen() {
-    return in -> lookupGreen[in];
+    return in -> GREEN_LOOKUP[in];
   }
 }

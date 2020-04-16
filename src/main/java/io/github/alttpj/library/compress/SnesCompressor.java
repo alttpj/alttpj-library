@@ -21,15 +21,18 @@ import static io.github.alttpj.library.compress.CompressorConstants.COMMAND_LENG
 import static java.util.stream.Collectors.toCollection;
 
 import io.github.alttpj.library.compress.impl.CopyCompressAlgorithm;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.TreeSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SnesCompressor implements AutoCloseable {
 
@@ -45,7 +48,7 @@ public class SnesCompressor implements AutoCloseable {
 
   private final ByteArrayOutputStream alreadyProcessed = new ByteArrayOutputStream();
 
-  private boolean isCompressed = false;
+  private boolean isCompressed;
 
   public SnesCompressor(final InputStream inputStream) {
     this.inputStream = new PushbackInputStream(inputStream, COMMAND_LENGTH_MAX_EXTENDED + 1);
@@ -98,7 +101,7 @@ public class SnesCompressor implements AutoCloseable {
   }
 
   protected static CompressionResult getBestCompressionAlgorithm(final byte[] buffer, final byte[] alreadyProcessed) {
-    final TreeSet<CompressionResult> algos = Arrays.stream(CompressionAlgorithms.values())
+    final Set<CompressionResult> algos = Arrays.stream(CompressionAlgorithms.values())
         .map(CompressionAlgorithms::getCompressionAlgorithm)
         .map(algo -> new CompressionResult(algo, buffer, alreadyProcessed))
         .sorted()
@@ -122,7 +125,6 @@ public class SnesCompressor implements AutoCloseable {
       this.inputStream.unread(buffer, 0, read);
 
       // try compression on this.
-      // TODO: simulate alreadyCompressed with readUncompressed added.
       final int maxSizeNewBuffer = Math.min(Math.abs(read - readUncompressed), COMMAND_LENGTH_MAX_EXTENDED);
       final byte[] newBuffer = new byte[maxSizeNewBuffer];
       System.arraycopy(buffer, readUncompressed, newBuffer, 0, newBuffer.length);
@@ -140,9 +142,9 @@ public class SnesCompressor implements AutoCloseable {
     }
 
     LOG.trace("Not compressing next [{}] bytes.", readUncompressed);
-    byte[] processed = new byte[readUncompressed];
-    int read1 = this.inputStream.read(processed);
-    byte[] compressed = new CopyCompressAlgorithm().apply(processed, read1 - 1);
+    final byte[] processed = new byte[readUncompressed];
+    final int read1 = this.inputStream.read(processed);
+    final byte[] compressed = new CopyCompressAlgorithm().apply(processed, read1 - 1);
     this.alreadyProcessed.write(processed, 0, readUncompressed);
     this.output.write(compressed);
 
@@ -152,6 +154,13 @@ public class SnesCompressor implements AutoCloseable {
       return;
     }
 
+    doChainCompression(chainedCompressionAlgo);
+  }
+
+  private void doChainCompression(final CompressionResult chainedCompressionAlgo) throws IOException {
+    final byte[] compressed;
+    final byte[] processed;
+    final int read1;
     LOG.trace("Chaining compression [{}].", chainedCompressionAlgo);
 
     compressed = chainedCompressionAlgo.apply();
@@ -166,19 +175,19 @@ public class SnesCompressor implements AutoCloseable {
   }
 
   /**
-   * how much can be read until EOF or 32 bits are read?
+   * Returns the number of bytes how many can be read until EOF or 32 bits are read.
    */
   private int getMaxRead() throws IOException {
     final byte[] buffer = new byte[COMMAND_LENGTH_MAX_EXTENDED];
     final int read = this.inputStream.read(buffer);
+
     if (read == -1) {
       return 0;
     }
+
     this.inputStream.unread(buffer, 0, read);
 
-    final int min = Math.min(COPY_MAX_READ, read);
-
-    return min;
+    return Math.min(COPY_MAX_READ, read);
   }
 
   @Override

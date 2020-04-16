@@ -34,6 +34,9 @@
     <maven.compiler.release>${java.version}</maven.compiler.release>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!--suppress UnresolvedMavenProperty -->
+    <project.buidasset.dir>${maven.multiModuleProjectDirectory}/build</project.buidasset.dir>
+    <checkstyle.header.file>${project.buidasset.dir}/header.txt</checkstyle.header.file>
   </properties>
 
   <!-- dependencies in the management section are not forced upon the child modules. -->
@@ -112,11 +115,11 @@
       <plugins>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
+          <groupId>org.apache.maven.plugins</groupId>
+          <version>3.8.1</version>
           <configuration>
             <release>${maven.compiler.release}</release>
           </configuration>
-          <groupId>org.apache.maven.plugins</groupId>
-          <version>3.8.1</version>
         </plugin>
 
         <plugin>
@@ -128,6 +131,18 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
+          <version>3.0.0-M3</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
           <version>3.0.0-M3</version>
         </plugin>
       </plugins>
@@ -191,7 +206,35 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
 
+      <!-- check code style -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <configLocation>${project.buidasset.dir}/checkstyle.xml</configLocation>
+          <encoding>UTF-8</encoding>
+          <consoleOutput>false</consoleOutput>
+          <linkXRef>false</linkXRef>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>8.31</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

@@ -18,9 +18,10 @@ package io.github.alttpj.library.compress.impl;
 
 import static io.github.alttpj.library.compress.CompressorConstants.COMMAND_LENGTH_MAX_NORMAL;
 
-import java.util.StringJoiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.StringJoiner;
 
 public class CopyCompressAlgorithm extends AbstractCompressionAlgorithm {
 

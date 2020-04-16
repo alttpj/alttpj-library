@@ -13,20 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package io.github.alttpj.library.image;
-
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.metadata.IIOMetadataFormatImpl;
-
-public class Alttp3bppImageFormat extends IIOMetadataFormatImpl {
-
-  public Alttp3bppImageFormat() {
-    super("alttp_3bpp_1.0", CHILD_POLICY_EMPTY);
-  }
-
-  @Override
-  public boolean canNodeAppear(final String elementName, final ImageTypeSpecifier imageType) {
-    return false;
-  }
-}

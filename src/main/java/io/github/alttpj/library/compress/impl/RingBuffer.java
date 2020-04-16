@@ -22,7 +22,7 @@ import java.util.StringJoiner;
 public class RingBuffer {
 
   private final byte[] elements;
-  private int pos = 0;
+  private int pos;
   private int readCount;
 
   public RingBuffer(final byte[] elements) {

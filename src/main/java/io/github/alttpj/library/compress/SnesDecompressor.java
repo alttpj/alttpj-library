@@ -16,13 +16,14 @@
 
 package io.github.alttpj.library.compress;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Locale;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SnesDecompressor implements AutoCloseable {
 
@@ -39,22 +40,16 @@ public class SnesDecompressor implements AutoCloseable {
   private static final int HEADER_MASK_LEN = 0b00011111;
 
   private final InputStream inputStream;
+
   /**
    * Indicates end of input stream.
    */
-  protected boolean eos;
-  /**
-   * current position in file. remove.
-   */
-  private int pos;
-  private boolean closed = false;
-  private final ByteArrayOutputStream decompressed = new ByteArrayOutputStream();
-  private boolean readFully = false;
+  private boolean eos;
 
-  private static String toBinaryString(final byte command) {
-    return String.format(Locale.ENGLISH,
-        "%8s", Integer.toBinaryString(command)).replace(' ', '0');
-  }
+  private boolean closed;
+  private final ByteArrayOutputStream decompressed = new ByteArrayOutputStream();
+
+  private boolean readFully;
 
   public SnesDecompressor(final InputStream inputStream) {
     this.inputStream = inputStream;
@@ -66,7 +61,7 @@ public class SnesDecompressor implements AutoCloseable {
   }
 
   /**
-   * Check to make sure that this stream has not been closed
+   * Check to make sure that this stream has not been closed.
    */
   private void ensureReadFully() {
     if (!this.readFully) {
@@ -75,17 +70,11 @@ public class SnesDecompressor implements AutoCloseable {
   }
 
   private int read() throws IOException {
-    final int read = this.inputStream.read();
-    this.pos++;
-
-    return read;
+    return this.inputStream.read();
   }
 
   public int read(final byte[] outputBuffer, final int off, final int maxReadLength) throws IOException {
-    final int read = this.inputStream.read(outputBuffer, off, maxReadLength);
-    this.pos += read;
-
-    return read;
+    return this.inputStream.read(outputBuffer, off, maxReadLength);
   }
 
   protected byte[] inflateNextCommand() throws IOException {
@@ -283,5 +272,10 @@ public class SnesDecompressor implements AutoCloseable {
       this.eos = true;
       this.inputStream.close();
     }
+  }
+
+  private static String toBinaryString(final byte command) {
+    return String.format(Locale.ENGLISH,
+        "%8s", Integer.toBinaryString(command)).replace(' ', '0');
   }
 }
