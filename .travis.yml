@@ -73,5 +73,5 @@ after_success:
   - |
     if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ] && [ "$TRAVIS_JDK" == "$DEFAULT_JDK" ]; then
       cp .travis.settings.xml $HOME/.m2/settings.xml
-      ./mvnw --batch-mode -X -Pdocs clean deploy
+      ./mvnw --batch-mode -Pdocs clean deploy -Dmaven.wagon.http.pool
     fi
