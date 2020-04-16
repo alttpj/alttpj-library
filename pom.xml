@@ -229,6 +229,14 @@
               </rules>
             </configuration>
           </execution>
+
+          <!-- the jacoco report needed for codecov.io. Generated in target/site/jacoco/. -->
+          <execution>
+            <id>report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
 

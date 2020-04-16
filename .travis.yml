@@ -45,10 +45,6 @@ matrix:
     - os: linux
       sudo: false
       env:
-        - TRAVIS_JDK=graalvm@1.0.0-14
-    - os: linux
-      sudo: false
-      env:
         - TRAVIS_JDK=openjdk@1.14.0
 
 before_cache:
