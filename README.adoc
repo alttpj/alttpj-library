@@ -1,6 +1,6 @@
 = ALttPJ - a Java library for Zelda 3: A Link To The Past Rom manipulation
 
-image:https://img.shields.io/badge/License-Apache%202.0-blue.svg[Apache License v2.0,link=https://opensource.org/licenses/Apache-2.0]
+image:https://img.shields.io/badge/License-Apache%202.0-blue.svg[Apache License v2.0,124,20,link=https://opensource.org/licenses/Apache-2.0]
 image:https://www.travis-ci.com/alttpj/alttpj-library.svg?branch=master[travis-ci.com,link=https://www.travis-ci.com/alttpj/alttpj-librar]
 image:https://codecov.io/gh/alttpj/alttpj-library/branch/master/graph/badge.svg[codecov.io,link=https://codecov.io/gh/alttpj/alttpj-library]
 
