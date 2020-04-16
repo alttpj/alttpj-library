@@ -20,8 +20,8 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.github.alttpj.io.github.alttpj.library</groupId>
-  <artifactId>alttpj-io.github.alttpj.library</artifactId>
+  <groupId>io.github.alttpj</groupId>
+  <artifactId>library</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
   <name>ALttP Java: io.github.alttpj.library</name>
@@ -83,7 +83,7 @@
     <dependency>
       <artifactId>logback-classic</artifactId>
       <groupId>ch.qos.logback</groupId>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -124,8 +124,76 @@
           <groupId>org.apache.maven.plugins</groupId>
           <version>3.2.2</version>
         </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>3.0.0-M3</version>
+        </plugin>
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+
+        <executions>
+          <!-- enforce JDK version. -->
+          <execution>
+            <id>enforce-java</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <!-- it actually means: JDK version. -->
+                <requireJavaVersion>
+                  <version>${jdk.version}</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+
+          <!-- no-dependencies-rule -->
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.slf4j:slf4j-api:*:jar:compile:*</exclude>
+                  </excludes>
+                  <includes>
+                    <!-- no runtime or compile dependencies are allowed except slf4j. -->
+                    <include>*:*:*:*:runtime:*</include>
+                    <include>*:*:*:*:compile:*</include>
+                  </includes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.5.2</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+
+      </plugin>
+    </plugins>
   </build>
 
 </project>

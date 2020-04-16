@@ -16,10 +16,10 @@ Coordinates will be:
 
 [source,xml]
 ----
-<!-- https://github.com/alttpj/alttpj-librar -->
+<!-- https://github.com/alttpj/alttpj-library -->
 <dependency>
-  <groupId>io.github.alttpj.io.github.alttpj.library</groupId>
-  <artifactId>alttpj-io.github.alttpj.library</artifactId>
+  <groupId>io.github.alttpj</groupId>
+  <artifactId>library</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ----
