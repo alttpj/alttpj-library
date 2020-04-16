@@ -72,5 +72,6 @@ after_success:
   # if this is the master branch, deploy the artifacts which were build from the default build matrix item.
   - |
     if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ] && [ "$TRAVIS_JDK" == "$DEFAULT_JDK" ]; then
-      echo "signing and deploying here."
+      cp .travis.settings.xml $HOME/.m2/settings.xml
+      ./mvnw --batch-mode -Pdocs clean deploy
     fi

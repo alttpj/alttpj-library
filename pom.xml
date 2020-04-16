@@ -24,7 +24,7 @@
   <artifactId>library</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
-  <name>ALttP Java: io.github.alttpj.library</name>
+  <name>ALttP Java: library</name>
 
   <properties>
     <!-- jdk needed -->
@@ -375,4 +375,32 @@
       <id>integration-tests</id>
     </profile>
   </profiles>
+
+  <licenses>
+    <license>
+      <name>Apache License v2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+
+  <inceptionYear>2020</inceptionYear>
+
+  <issueManagement>
+    <url>https://github.com/alttpj/alttpj-library/issues</url>
+    <system>GitHub</system>
+  </issueManagement>
+
+  <distributionManagement>
+    <repository>
+      <id>alttpj</id>
+      <name>GitHub alttpj Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/alttpj/repository</url>
+    </repository>
+    <snapshotRepository>
+      <id>alttpj-snapshots</id>
+      <name>GitHub alttpj Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/alttpj/snapshot-repository</url>
+    </snapshotRepository>
+  </distributionManagement>
+
 </project>
