@@ -33,12 +33,8 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Alttp3bppImageReader extends ImageReader {
-
-    private static final Logger LOG = LoggerFactory.getLogger(Alttp3bppImageReader.class);
 
     private static final int BUFFER_SIZE = 512;
 
@@ -197,7 +193,6 @@ public class Alttp3bppImageReader extends ImageReader {
                 if (abortRequested()) {
                     break;
                 }
-                LOG.info("Tile #[{}]. Xstart: [{}]. YStart: [{}].", tileX + 1 + tileY * width / 8, tileX * 8, tileY * 8);
                 drawTile(rasterPaletteData, raster, tileX, tileY, width);
                 if (abortRequested()) {
                     break;
@@ -226,7 +221,6 @@ public class Alttp3bppImageReader extends ImageReader {
                 final byte byteForXY = uncompressedOut[posInDataArray];
                 final int[] color = Palette3bpp.GREEN.getColor(byteForXY);
 
-                LOG.info("read offset [{}], written to [{}]/[{}].", posInDataArray, x + xOffsetRaster, y + yOffsetRaster);
                 raster.setPixel(x + xOffsetRaster, y + yOffsetRaster, color);
             }
         }

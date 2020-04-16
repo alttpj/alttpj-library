@@ -1,0 +1,31 @@
+= Contributing
+
+== How to create a PR
+
+. fork this repository
+. create a feature branch which has the name `alttpj-lib-#iss`. +
+Example: `alttpj-lib-1` using `git checkout -b alttpj-lib-1`.
+. Develop
+. Create some junit tests.
+Keep them SIMPLE. If you set up too many mocks, you are doing something wrong.
+. When you are done, execute `mvn clean verify` before commiting. +
+Pay attention to checkstyle checks, tests and
+. Commit and push
+. Create pull request.
+
+== How to develop
+
+* Make sure your IDE picks up the checkstyle rules from `build/checkstyle.xml`.
+* Do not change any lines which you did not need to touch (e.g. adding or removing a modifier).
+* Do not add or remove whitespace if not needed.
+* Do not use `else`.
+If you encounter an else, refactor out into a method which does this: +
+
+```java
+if (special condition) {
+  return
+};
+normallogic;
+return;
+``
+

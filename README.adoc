@@ -36,10 +36,14 @@ The root package is: `io.github.alttpj.library`
 Use ImageIO (tbd). `.zspr` files will be supported later on.
 Current state: Read images with the green palette which are 128x32.
 
-== Dependencies
+== Runtime Dependencies
 
 None.
 This project will get rid even of the `slf4j` dependency once "finished".
+
+== Installation
+
+See link:INSTALL.adoc[INSTALL].
 
 == Roadmap
 
@@ -47,3 +51,5 @@ Things which need to be done:
 
 * (Maybe) Use imageIndex for the tiles in Alttp3bppImageReader
 * Add more formats, e.g. one format which includes the palette index.
+* See issues and link:CONTRIBUTING.adoc[CONTRIBUTING] if you want to help out. +
+Your help is very much appreciated!

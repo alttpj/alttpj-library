@@ -1,0 +1,31 @@
+= Installing
+
+This file includes instructions on how to compile and install this library.
+
+== Prerequisites
+
+* Java SDK version 11 or higher.
+
+*Note*: This is just a compile time dependency.
+The bytecode will be Java 8 compatible due to the use of the `-release=8` switch.
+
+== Installing to your local repository
+
+* On Linux and MacOS: +
+`./mvnw clean install`
+
+* On Windows: +
+`mvnw.cmd clean install`
+
+If the installation was successful, you can now use this library as described in the link:README.adoc#how-to-use[README].
+
+== Dependencies
+
+=== Compile & Runtime dependencies
+
+None.
+
+=== Test dependencies
+
+This library needs slf4j, logback-classic, junit-jupiter and hamcrest-library for executing tests.
+Thus, you need those libraries installed _or_ a working internet connection.
