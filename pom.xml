@@ -21,7 +21,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.github.alttpj.library</groupId>
-  <artifactId>library</artifactId>
+  <artifactId>alttpj-library</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
   <name>ALttP Java: library</name>

@@ -22,8 +22,8 @@ Coordinates will be:
 ----
 <!-- https://github.com/alttpj/alttpj-library -->
 <dependency>
-  <groupId>io.github.alttpj</groupId>
-  <artifactId>library</artifactId>
+  <groupId>io.github.alttpj.library</groupId>
+  <artifactId>alttpj-library</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ----
