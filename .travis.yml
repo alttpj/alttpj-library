@@ -20,6 +20,8 @@ matrix:
   include:
     - os: linux
       sudo: false
+      # xenial needed for openssl with pbkdf2
+      dist: xenial
       env:
         - TRAVIS_JDK=$DEFAULT_JDK
     - os: linux
