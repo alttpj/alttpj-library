@@ -75,7 +75,11 @@ after_success:
   - |
     if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ] && [ "$TRAVIS_JDK" == "$DEFAULT_JDK" ]; then
       openssl enc -aes-256-cbc -d -in .deployment/signingkey.asc.enc -out .deployment/signingkey.asc -K $SIGNKEY_ENCRYPTION_KEY -S $SIGNKEY_ENCRYPTION_SALT -iv $SIGNKEY_ENCRYPTION_IV
-      gpg2 --batch --keyring=$TRAVIS_BUILD_DIR/pubring.gpg --no-default-keyring --import .deployment/signingkey.asc
-      gpg2 --batch --allow-secret-key-import --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring --import .deployment/signingkey.asc
-      ./mvnw --batch-mode -Pdocs,deploy,ossrh deploy --settings .deployment/.travis.settings.xml -DskipTests -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg -Dgpg.secretKeyring=$TRAVIS_BUILD_DIR/secring.gpg -Dgpg.defaultKeyring=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+      gpg --batch --keyring=$TRAVIS_BUILD_DIR/pubring.gpg --no-default-keyring --import .deployment/signingkey.asc
+      gpg --batch --allow-secret-key-import --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring --import .deployment/signingkey.asc
+      ./mvnw --batch-mode -Pdocs,deploy,ossrh deploy \
+        --settings .deployment/.travis.settings.xml \
+        -DskipTests \
+        -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg -Dgpg.secretKeyring=$TRAVIS_BUILD_DIR/secring.gpg -Dgpg.defaultKeyring=false \
+        -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
     fi
