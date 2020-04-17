@@ -74,7 +74,7 @@ after_success:
   # if this is the master branch, deploy the artifacts which were build from the default build matrix item.
   - |
     if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ] && [ "$TRAVIS_JDK" == "$DEFAULT_JDK" ]; then
-      echo "$SIGNKEY_ENCRYPTION_PW" | gpg --passphrase-fd 0 --output .deployment/signingkey.asc --decrypt .deployment/signingkey.asc.asc
+      echo "$SIGNKEY_ENCRYPTION_PW" | gpg --batch --pinentry-mode=loopback --passphrase-fd 0 --output .deployment/signingkey.asc --decrypt .deployment/signingkey.asc.asc
       gpg --batch --keyring=$TRAVIS_BUILD_DIR/pubring.gpg --no-default-keyring --import .deployment/signingkey.asc
       gpg --batch --allow-secret-key-import --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring --import .deployment/signingkey.asc
       ./mvnw --batch-mode -Pdocs,deploy,ossrh deploy --settings .deployment/.travis.settings.xml -DskipTests -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg -Dgpg.secretKeyring=$TRAVIS_BUILD_DIR/secring.gpg
