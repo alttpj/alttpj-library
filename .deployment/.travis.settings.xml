@@ -24,6 +24,11 @@
   <profiles>
     <profile>
       <id>github</id>
+
+      <properties>
+        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+      </properties>
+
       <repositories>
         <repository>
           <id>central</id>
@@ -35,15 +40,60 @@
             <enabled>true</enabled>
           </snapshots>
         </repository>
+
         <repository>
           <id>alttpj</id>
           <name>GitHub alttpj Apache Maven Packages</name>
           <url>https://maven.pkg.github.com/alttpj/repository</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
         </repository>
         <repository>
           <id>alttpj-snapshots</id>
           <name>GitHub alttpj Apache Maven Snapshot Packages</name>
           <url>https://maven.pkg.github.com/alttpj/snapshot-repository</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+
+    <profile>
+      <id>ossrh</id>
+
+      <properties>
+        <gpg.keyname>${env.GPG_KEYNAME}</gpg.keyname>
+        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+      </properties>
+
+      <repositories>
+        <repository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>ossrh-snapshots</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </repository>
       </repositories>
     </profile>
@@ -52,13 +102,24 @@
   <servers>
     <server>
       <id>alttpj</id>
-      <username>bmhm</username>
+      <username>${env.GITHUB_MVN_DEPLOY_USER}</username>
       <password>${env.GITHUB_MVN_TOKEN}</password>
     </server>
     <server>
       <id>alttpj-snapshots</id>
       <username>${env.GITHUB_MVN_DEPLOY_USER}</username>
       <password>${env.GITHUB_MVN_TOKEN}</password>
+    </server>
+
+    <server>
+      <id>ossrh</id>
+      <username>${env.OSSRH_MVN_DEPLOY_USER}</username>
+      <password>${env.OSSRH_MVN_TOKEN}</password>
+    </server>
+    <server>
+      <id>ossrh-snapshots</id>
+      <username>${env.OSSRH_MVN_DEPLOY_USER}</username>
+      <password>${env.OSSRH_MVN_TOKEN}</password>
     </server>
   </servers>
 </settings>

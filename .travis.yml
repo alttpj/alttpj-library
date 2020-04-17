@@ -10,6 +10,7 @@ env:
     # It now belongs to the eclipse foundation. OpenJ9 has great debugging options.
     - DEFAULT_JDK=adopt-openj9@1.11.0-6
     - TRAVIS_JDK=$DEFAULT_JDK
+    - secure: "g5N+abhMubpyoqrTuOrFwihpqUqZ0qOi1ZcekWFJCERSCjHI79K5CQQqBFNfqUiDttTto2+u6RWSSPkaEe0lQRtfcVD53U8BcMRM7W2NBcGiKDLSb0LLsP+FGkri/cQc9plslhjU8PEmKOM7Oiq2WA7NbZrnzRH/Lqh4U5DQntn2oWBrqkGUlF0b8sNxLWSrxDeKYqLwoGbqZqH9obIP0FpeSZKiXelZ02bIajAc5zhfQeJdyFcLp5p4pmE6fX+CrYE5dS7MDSoUdzyWeU3e1n+W02RjnLygroZ0NYyrtrDtsxJ0AQJgK+tVzXGVAvB2IBiKAIv/pPYaRNHY6LVvxJ/wnJI29KwRFM1SUSBqODprikiWHLg7+sVCjOb+zWty4T30zsSDFQApelfju5pluksbShxSg9dVITJP3s/L1EmiATElC+HqLc6eDfxI++QkT3xMk24Q690kKJXc9AKjSTABDyJVNBAlhnYklnhJQPlyThhvBUjLOsS9zJDwBC85ULFgSLaanvgHT/YcWK4GiPKx+3P7doKDmHIFEoTjxiWuT0hQjNZf87kRZgV7UKJOkIffrbTr9VdHmdquUNiEmHdVPn7KrnFYM7hfZeDlOIf+pjmOHmuwm76bHkcJa8i+mI2RxszVBLDN1v5uk/vgf3TMR7q+Y2gVA+2cLEAsBvs="
 
 cache:
   directories:
@@ -72,6 +73,8 @@ after_success:
   # if this is the master branch, deploy the artifacts which were build from the default build matrix item.
   - |
     if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ] && [ "$TRAVIS_JDK" == "$DEFAULT_JDK" ]; then
-      cp .travis.settings.xml $HOME/.m2/settings.xml
-      ./mvnw --batch-mode -Pdocs clean deploy -Dmaven.wagon.http.pool
+      openssl aes-256-cbc -pbkdf2 -iter 100000 -k $signingkey_encryption_pw -in .deployment/signingkey.asc.enc -out .deployment/signingkey.asc -d
+      gpg --batch --keyring=$TRAVIS_BUILD_DIR/pubring.gpg --no-default-keyring --import .deployment/signingkey.asc
+      gpg --batch --allow-secret-key-import --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring --import .deployment/signingkey.asc
+      ./mvnw --batch-mode -Pdocs,deploy,ossrh deploy --settings .deployment/.travis.settings.xml -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg -Dgpg.secretKeyring=$TRAVIS_BUILD_DIR/secring.gpg
     fi
