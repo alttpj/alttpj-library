@@ -1,4 +1,4 @@
-laguage: java
+language: java
 
 env:
   global:
@@ -16,36 +16,29 @@ cache:
     - "$HOME/.m2"
     - "$HOME/.jabba"
 
-matrix:
+jobs:
   include:
     - os: linux
-      sudo: false
       # xenial needed for openssl with pbkdf2
       dist: xenial
       env:
         - TRAVIS_JDK=$DEFAULT_JDK
     - os: linux
-      sudo: false
       env:
         - TRAVIS_JDK=adopt@1.11.0-6
     - os: linux
-      sudo: false
       env:
         - TRAVIS_JDK=amazon-corretto@1.11.0-6.10.1
     - os: linux
-      sudo: false
       env:
         - TRAVIS_JDK=zulu@1.11.0-6
     - os: linux
-      sudo: false
       env:
         - TRAVIS_JDK=adopt@1.14.0-0
     - os: linux
-      sudo: false
       env:
         - TRAVIS_JDK=adopt-openj9@1.14.0-0
     - os: linux
-      sudo: false
       env:
         - TRAVIS_JDK=openjdk@1.14.0
 

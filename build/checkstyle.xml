@@ -579,14 +579,14 @@
 
     <module name="AbbreviationAsWordInName">
       <property name="allowedAbbreviationLength" value="2"/>
-      
+      <property name="allowedAbbreviations" value="FI"/>
       <property name="allowedAbbreviations" value="XML"/>
       <property name="allowedAbbreviations" value="URL"/>
       <property name="allowedAbbreviations" value="URI"/>
       <property name="allowedAbbreviations" value="JSON"/>
-      
-      
-      
+      <property name="allowedAbbreviations" value="MiWE"/>
+      <property name="allowedAbbreviations" value="NEAT"/>
+      <property name="allowedAbbreviations" value="FISP"/>
 
       <property name="ignoreOverriddenMethods" value="true"/>
       <property name="ignoreFinal" value="false"/>
