@@ -22,9 +22,6 @@ import static java.util.stream.Collectors.toCollection;
 
 import io.github.alttpj.library.compress.impl.CopyCompressAlgorithm;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,10 +30,12 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SnesCompressor implements AutoCloseable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SnesCompressor.class);
+  private static final Logger LOG = Logger.getLogger(SnesCompressor.class.getCanonicalName());
   private static final int COPY_MAX_READ = COMMAND_LENGTH_MAX_NORMAL;
 
   /**
@@ -141,7 +140,7 @@ public class SnesCompressor implements AutoCloseable {
       }
     }
 
-    LOG.trace("Not compressing next [{}] bytes.", readUncompressed);
+    LOG.log(Level.FINEST, "Not compressing next [" + readUncompressed + "] bytes.");
     final byte[] processed = new byte[readUncompressed];
     final int read1 = this.inputStream.read(processed);
     final byte[] compressed = new CopyCompressAlgorithm().apply(processed, read1 - 1);
@@ -161,7 +160,7 @@ public class SnesCompressor implements AutoCloseable {
     final byte[] compressed;
     final byte[] processed;
     final int read1;
-    LOG.trace("Chaining compression [{}].", chainedCompressionAlgo);
+    LOG.log(Level.FINEST, "Chaining compression [" + chainedCompressionAlgo + "].");
 
     compressed = chainedCompressionAlgo.apply();
     processed = new byte[chainedCompressionAlgo.getCommandLength() + 1];

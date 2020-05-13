@@ -46,23 +46,6 @@
   <!-- dependencies in the management section are not forced upon the child modules. -->
   <dependencyManagement>
     <dependencies>
-      <!-- slf4j is an implementation-independent log framework. -->
-      <dependency>
-        <artifactId>slf4j-api</artifactId>
-        <groupId>org.slf4j</groupId>
-        <scope>compile</scope>
-        <version>1.7.30</version>
-      </dependency>
-
-      <!-- this is the actual implementation which will result in log messages being configurable and printed. -->
-      <dependency>
-        <artifactId>logback-classic</artifactId>
-        <groupId>ch.qos.logback</groupId>
-        <scope>runtime</scope>
-        <!-- runtime means: only needed for tests or executing the app, not while compiling. -->
-        <version>1.2.3</version>
-      </dependency>
-
       <!-- test dependencies -->
       <dependency>
         <artifactId>junit-jupiter-engine</artifactId>
@@ -81,18 +64,6 @@
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <artifactId>slf4j-api</artifactId>
-      <groupId>org.slf4j</groupId>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <artifactId>logback-classic</artifactId>
-      <groupId>ch.qos.logback</groupId>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <artifactId>junit-jupiter-engine</artifactId>
       <groupId>org.junit.jupiter</groupId>

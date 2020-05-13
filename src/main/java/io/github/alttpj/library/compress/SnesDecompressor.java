@@ -16,18 +16,17 @@
 
 package io.github.alttpj.library.compress;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SnesDecompressor implements AutoCloseable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SnesDecompressor.class);
+  private static final Logger LOG = Logger.getLogger(SnesDecompressor.class.getCanonicalName());
 
   /**
    * First half byte is the command.
@@ -121,9 +120,7 @@ public class SnesDecompressor implements AutoCloseable {
   }
 
   protected byte[] readCommand0Copy(final int commandLength) throws IOException {
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("Command 0 - Read the next n bytes as is");
-    }
+    LOG.log(Level.FINEST, "Command 0 - Read the next n bytes as is");
 
     final byte[] outputBuffer = new byte[commandLength];
     final int read = read(outputBuffer, 0, commandLength);
@@ -201,8 +198,8 @@ public class SnesDecompressor implements AutoCloseable {
     final int offset = ((a & 0xff)) | ((b & 0xff) << 8);
 
     if (offset > lengthOutputBuffer) {
-      LOG.error("Unable to read. Algo wrong. Offset [{}], Length Output: [{}].", offset, lengthOutputBuffer);
-      LOG.error("a = [{}], b = [{}].", toBinaryString(a), toBinaryString(b));
+      LOG.log(Level.SEVERE, "Unable to read. Algo wrong. Offset [" + offset + "], Length Output: [" + lengthOutputBuffer + "].");
+      LOG.log(Level.SEVERE, "a = [" + toBinaryString(a) + "], b = [" + toBinaryString(b) + "].");
     }
 
     // read as ring buffer

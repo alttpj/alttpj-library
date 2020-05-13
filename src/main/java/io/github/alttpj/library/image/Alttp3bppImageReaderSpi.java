@@ -16,19 +16,18 @@
 
 package io.github.alttpj.library.image;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.StringJoiner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
 public class Alttp3bppImageReaderSpi extends ImageReaderSpi {
 
-  private static final Logger LOG = LoggerFactory.getLogger(Alttp3bppImageReaderSpi.class);
+  private static final Logger LOG = Logger.getLogger(Alttp3bppImageReaderSpi.class.getCanonicalName());
 
   private static final String[] WRITER_SPI_NAMES = {"com.sun.imageio.plugins.bmp.BMPImageWriterSpi"};
   private static final String[] FORMAT_NAMES = {"3bpp", "3bp"};
@@ -54,7 +53,7 @@ public class Alttp3bppImageReaderSpi extends ImageReaderSpi {
 
   @Override
   public boolean canDecodeInput(final Object source) {
-    LOG.trace("Source: [{}].", source);
+    LOG.log(Level.FINEST, "Source: [" + source + "].");
     return true;
   }
 
