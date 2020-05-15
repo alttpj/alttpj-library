@@ -16,11 +16,12 @@
 
 package io.github.alttpj.library.image;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import io.github.alttpj.library.image.palette.Palette;
+import io.github.alttpj.library.image.palette.Palette3bpp;
+import io.github.alttpj.library.testhelper.SpriteBytes;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,67 +29,78 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 class Alttp3bppImageReaderTest {
 
-    @Test
-    void testUnpack3bppTiles() throws IOException {
-        final InputStream oneUpPackedUncompressedStream = this.getClass().getResourceAsStream("/gfx/u_1up.bin");
-        final byte[] inputPacked = readAllBytes(oneUpPackedUncompressedStream);
+  @Test
+  void testUnpack3bppTiles() throws IOException {
+    final InputStream oneUpPackedUncompressedStream = this.getClass().getResourceAsStream("/gfx/u_1up.bin");
+    final byte[] inputPacked = readAllBytes(oneUpPackedUncompressedStream);
 
-        final byte[] unpacked = Alttp3bppImageReader.unpack3bppTiles(inputPacked);
+    final byte[] unpacked = Alttp3bppImageReader.unpack3bppTiles(inputPacked);
 
-        assertAll(
-            () -> assertEquals(4096, unpacked.length)
-        );
+    assertAll(
+        () -> assertEquals(4096, unpacked.length)
+    );
+  }
+
+  @Test
+  public void testUncompress() throws IOException {
+    final TiledSprite imageInputStream = new TiledSprite() {
+      @Override
+      public Tile[] getTiles() {
+        return SpriteBytes.get1up();
+      }
+
+      @Override
+      public Palette getPalette() {
+        return Palette3bpp.GREEN;
+      }
+    };
+
+    // when
+    final byte[] uncompressedPacked = Alttp3bppImageReader.readPackedTiles(imageInputStream);
+
+    // then
+    assertEquals(24 * 4L, uncompressedPacked.length);
+  }
+
+  @Test
+  public void readImage() throws IOException {
+    final TiledSprite tiled1upSprite = new TiledSprite() {
+      @Override
+      public Tile[] getTiles() {
+        return SpriteBytes.get1up();
+      }
+
+      @Override
+      public Palette getPalette() {
+        return Palette3bpp.GREEN;
+      }
+    };
+    final Alttp3bppImageReader alttp3bppImageReader = new Alttp3bppImageReader(tiled1upSprite);
+
+    // when
+    final BufferedImage read = alttp3bppImageReader.read();
+
+    // then
+    assertAll(
+        () -> assertEquals(16, read.getHeight()),
+        () -> assertEquals(16, read.getWidth())
+    );
+  }
+
+  private byte[] readAllBytes(final InputStream oneUpStream) throws IOException {
+    final byte[] inputCompressed;
+
+    try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+      final byte[] buffer = new byte[512];
+      int readCount;
+      while ((readCount = oneUpStream.read(buffer)) != -1) {
+        byteArrayOutputStream.write(buffer, 0, readCount);
+      }
+      inputCompressed = byteArrayOutputStream.toByteArray();
     }
-
-    @Test
-    public void testUncompress() throws IOException {
-        final InputStream oneUpPackedCompressedStream = this.getClass().getResourceAsStream("/gfx/1up.bin");
-        final ImageInputStream imageInputStream = ImageIO.createImageInputStream(oneUpPackedCompressedStream);
-
-        // when
-        final byte[] uncompressedPacked = Alttp3bppImageReader.readCompressedImage(imageInputStream);
-
-        // then
-        final byte[] expected = readAllBytes(this.getClass().getResourceAsStream("/gfx/u_1up.bin"));
-        assertArrayEquals(expected, uncompressedPacked);
-    }
-
-    @Test
-    void testCanCreateBufferedImage() throws IOException {
-        // given
-        // must be invoked directly.
-        final ImageReader imageReader = new Alttp3bppImageReaderSpi().createReaderInstance(null);
-        final InputStream oneUpPackedCompressedStream = this.getClass().getResourceAsStream("/gfx/1up.bin");
-        final ImageInputStream imageInputStream = ImageIO.createImageInputStream(oneUpPackedCompressedStream);
-        imageReader.setInput(imageInputStream);
-
-        // when
-        final BufferedImage bufferedImage = imageReader.read(0);
-
-        // then
-        assertAll(
-            () -> assertThat(bufferedImage.getHeight(), is(32)),
-            () -> assertThat(bufferedImage.getWidth(), is(128))
-        );
-    }
-
-    private byte[] readAllBytes(final InputStream oneUpStream) throws IOException {
-        final byte[] inputCompressed;
-
-        try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            final byte[] buffer = new byte[512];
-            int readCount;
-            while ((readCount = oneUpStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, readCount);
-            }
-            inputCompressed = byteArrayOutputStream.toByteArray();
-        }
-        return inputCompressed;
-    }
+    return inputCompressed;
+  }
 }

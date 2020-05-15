@@ -16,20 +16,35 @@
 
 package io.github.alttpj.library.image;
 
+import io.github.alttpj.library.image.palette.Palette;
+import io.github.alttpj.library.image.palette.Palette3bpp;
+import io.github.alttpj.library.testhelper.SpriteBytes;
+
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 public class TestUI {
 
-  public static void main(final String[] args) throws IOException, InterruptedException {
-    final BufferedImage bufferedImage = ImageIO.read(Alttp3bppImageReaderTest.class.getResourceAsStream("/gfx/1up.bin"));
+  public static void main(final String[] args) throws InterruptedException, IOException {
+    final TiledSprite tiledSprite = new TiledSprite() {
+      @Override
+      public Tile[] getTiles() {
+        return SpriteBytes.get1up();
+      }
+
+      @Override
+      public Palette getPalette() {
+        return Palette3bpp.GREEN;
+      }
+    };
+    final Alttp3bppImageReader alttp3bppImageReader = new Alttp3bppImageReader(tiledSprite);
+    final BufferedImage bufferedImage = alttp3bppImageReader.read();
     final Image scaledInstance = bufferedImage
         .getScaledInstance(bufferedImage.getWidth() * 4, bufferedImage.getHeight() * 4, Image.SCALE_AREA_AVERAGING);
 

@@ -9,7 +9,6 @@ env:
     # openj9 has a smaller footprint, faster startup and was originally developed by IBM as J9.
     # It now belongs to the eclipse foundation. OpenJ9 has great debugging options.
     - DEFAULT_JDK=adopt-openj9@1.11.0-6
-    - TRAVIS_JDK=$DEFAULT_JDK
 
 cache:
   directories:
@@ -75,6 +74,5 @@ after_success:
       ./mvnw --batch-mode -Pdocs,deploy,ossrh deploy \
         --settings .deployment/.travis.settings.xml \
         -DskipTests \
-        -Dgpg.defaultKeyring=false -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg -Dgpg.secretKeyring=$TRAVIS_BUILD_DIR/secring.gpg \
-        -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+        -Dgpg.defaultKeyring=false -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg -Dgpg.secretKeyring=$TRAVIS_BUILD_DIR/secring.gpg
     fi
