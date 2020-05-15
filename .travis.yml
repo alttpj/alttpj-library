@@ -65,7 +65,7 @@ after_success:
     fi
   # if this is the master branch, deploy the artifacts which were build from the default build matrix item.
   - |
-    if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ] && [ "$TRAVIS_JDK" == "$DEFAULT_JDK" ]; then
+    if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_JDK" == "$DEFAULT_JDK" ]; then
       openssl enc -aes-256-cbc -d -in .deployment/signingkey.asc.enc -out .deployment/signingkey.asc -K $SIGNKEY_ENCRYPTION_KEY -S $SIGNKEY_ENCRYPTION_SALT -iv $SIGNKEY_ENCRYPTION_IV
 
       echo "Importing key"
