@@ -18,14 +18,13 @@ package io.github.alttpj.library.compress.impl;
 
 import static io.github.alttpj.library.compress.CompressorConstants.COMMAND_LENGTH_MAX_NORMAL;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.StringJoiner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CopyCompressAlgorithm extends AbstractCompressionAlgorithm {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CopyCompressAlgorithm.class);
+  private static final Logger LOG = Logger.getLogger(CopyCompressAlgorithm.class.getCanonicalName());
 
   public CopyCompressAlgorithm() {
     super(0);
@@ -44,8 +43,8 @@ public class CopyCompressAlgorithm extends AbstractCompressionAlgorithm {
     if (commandLength > COMMAND_LENGTH_MAX_NORMAL) {
       // we do not want a long copy of a byte array, because it might contain better
       // compression options at other indices.
-      LOG.warn("Copying more than COMMAND_LENGTH_MAX_NORMAL(" + COMMAND_LENGTH_MAX_NORMAL + ") bytes.");
-      LOG.warn("If you see this message, refactor the code to not use copy for this amount.");
+      LOG.log(Level.WARNING, "Copying more than COMMAND_LENGTH_MAX_NORMAL(" + COMMAND_LENGTH_MAX_NORMAL + ") bytes.");
+      LOG.log(Level.WARNING, "If you see this message, refactor the code to not use copy for this amount.");
       // add two headers and contentlength = commandlength+1
       final byte[] out = new byte[2 + contentLength];
       writeExtendedHeader(out, commandLength);

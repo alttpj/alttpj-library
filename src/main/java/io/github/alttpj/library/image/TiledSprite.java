@@ -16,17 +16,21 @@
 
 package io.github.alttpj.library.image;
 
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.metadata.IIOMetadataFormatImpl;
+import io.github.alttpj.library.image.palette.Palette;
 
-public class Alttp3bppImageFormat extends IIOMetadataFormatImpl {
+public interface TiledSprite {
 
-  public Alttp3bppImageFormat() {
-    super("alttp_3bpp_1.0", CHILD_POLICY_EMPTY);
-  }
+  /**
+   * The uncompressed, but packed tiles.
+   *
+   * @return the tiles from this sprite.
+   */
+  Tile[] getTiles();
 
-  @Override
-  public boolean canNodeAppear(final String elementName, final ImageTypeSpecifier imageType) {
-    return false;
-  }
+  /**
+   * The palette used for this sprite.
+   *
+   * @return the used palette.
+   */
+  Palette getPalette();
 }

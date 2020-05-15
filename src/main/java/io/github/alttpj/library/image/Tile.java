@@ -16,25 +16,16 @@
 
 package io.github.alttpj.library.image;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+/**
+ * A tile is a 8px by 8px part of a sprite.
+ * The tile itself can be a sprite if the sprite consists of just one tile.
+ */
+public interface Tile {
 
-import org.junit.jupiter.api.Test;
-
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageTypeSpecifier;
-
-public class Alttp3bppImageFormatTest {
-
-  @Test
-  void testApiStable() {
-    // given
-    final Alttp3bppImageFormat alttp3bppImageFormat = new Alttp3bppImageFormat();
-    final ImageTypeSpecifier imageType = ImageTypeSpecifier.createFromBufferedImageType(BufferedImage.TYPE_BYTE_INDEXED);
-
-    // when
-    final boolean canNodeAppear =
-        alttp3bppImageFormat.canNodeAppear("node", imageType);
-
-    assertFalse(canNodeAppear);
-  }
+  /**
+   * Returns the uncompressed bytes of the tile.
+   *
+   * @return the uncompressed bytes of the tile.
+   */
+  byte[] getBytes();
 }

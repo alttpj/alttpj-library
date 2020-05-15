@@ -19,4 +19,6 @@ package io.github.alttpj.library.image.palette;
 public interface Palette {
 
   int[] getColor(int in);
+
+  int getBitsPerPixel();
 }
