@@ -32,6 +32,7 @@ public class Palette3bppTest {
     final int[] color = green.getColor(4);
 
     // then
+    assertThat(green.getName(), is("GREEN"));
     assertThat("must contain rgba values", color.length, is(4));
   }
 

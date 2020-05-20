@@ -44,7 +44,7 @@ public class IncrementByteCompressionAlgorithm extends AbstractCompressionAlgori
       incrementCount++;
     }
 
-    if (incrementCount < 4) {
+    if (incrementCount < 3) {
       // does not suffice.
       return 0;
     }

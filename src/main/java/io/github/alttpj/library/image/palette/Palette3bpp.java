@@ -16,16 +16,27 @@
 
 package io.github.alttpj.library.image.palette;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.StringJoiner;
 
 public final class Palette3bpp implements Palette {
 
-  public static final Palette GREEN = new Palette3bpp(Palette3bppColors.GREEN_LOOKUP);
+  public static final Palette GREEN = new Palette3bpp("GREEN", Palette3bppColors.GREEN_LOOKUP);
 
-  private final int[][] colors;
+  public static final Palette BLUE = new Palette3bpp("BLUE", Palette3bppColors.BLUE_LOOKUP);
 
-  private Palette3bpp(final int[][] colors) {
+  public static final Palette RED = new Palette3bpp("RED", Palette3bppColors.RED_LOOKUP);
+
+  private final Snes3bppColorIndex[] colors;
+
+  private final String name;
+
+  private Palette3bpp(final String name, final Snes3bppColorIndex[] colors) {
+    this.name = name.toUpperCase(Locale.ENGLISH);
     this.colors = colors;
   }
 
@@ -36,12 +47,25 @@ public final class Palette3bpp implements Palette {
 
   @Override
   public int[] getColor(final int in) {
-    return this.colors[in];
+    return this.colors[in].colors;
+  }
+
+  @Override
+  public List<int[]> getColors() {
+    return Arrays.stream(this.colors)
+        .map(Snes3bppColorIndex::getColors)
+        .collect(toList());
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", "Palette3bpp{", "}")
+        .add("name=" + this.name)
         .add("colors=" + Arrays.toString(this.colors))
         .toString();
   }
@@ -49,23 +73,81 @@ public final class Palette3bpp implements Palette {
   // Palettes. Must have their own class due to initializing order.
 
   static class Palette3bppColors {
-    private static final int[][] GREEN_LOOKUP = new int[][] {
-        // 0b000: light grey
-        new int[] {150, 150, 150, 255},
+    private static final Snes3bppColorIndex[] GREEN_LOOKUP = new Snes3bppColorIndex[] {
+        // 0b000: transparent
+        new Snes3bppColorIndex((byte) 0x00, new int[] {0, 0, 0, 0}),
         // 0b001: white // FIX
-        new int[] {255, 255, 255, 255},
-        // 0b001: light grey
-        new int[] {150, 150, 150, 255},
-        // 0b011: dark green // fix
-        new int[] {0, 150, 0, 255},
-        // 0b100: green
-        new int[] {0, 255, 0, 255},
+        new Snes3bppColorIndex((byte) 0x01, new int[] {248, 248, 248, 255}),
+        // 0b001: Red
+        new Snes3bppColorIndex((byte) 0x02, new int[] {200, 48, 24, 255}),
+        // 0b011: dark green
+        new Snes3bppColorIndex((byte) 0x03, new int[] {72, 144, 48, 255}),
+        // 0b100: light green
+        new Snes3bppColorIndex((byte) 0x04, new int[] {152, 208, 112, 255}),
         // 0b101: black // FIX
-        new int[] {0, 0, 0, 255},
-        // 0b110: light blue
-        new int[] {100, 100, 255, 255},
-        // 0b111: black
-        new int[] {0, 0, 0, 255}
+        new Snes3bppColorIndex((byte) 0x05, new int[] {40, 40, 40, 255}),
+        // 0b110: light yellow
+        new Snes3bppColorIndex((byte) 0x06, new int[] {248, 208, 55, 255}),
+        // 0b111: dark yellow
+        new Snes3bppColorIndex((byte) 0x07, new int[] {184, 136, 32, 255})
     };
+
+    private static final Snes3bppColorIndex[] BLUE_LOOKUP = new Snes3bppColorIndex[] {
+        // 0b000: transparent
+        new Snes3bppColorIndex((byte) 0x00, new int[] {0, 0, 0, 0}),
+        // 0b001: white // FIX
+        new Snes3bppColorIndex((byte) 0x01, new int[] {248, 248, 248, 255}),
+        // 0b001: pink
+        new Snes3bppColorIndex((byte) 0x02, new int[] {248, 128, 176, 255}),
+        // 0b011: dark blue
+        new Snes3bppColorIndex((byte) 0x03, new int[] {80, 104, 168, 255}),
+        // 0b100: light blue
+        new Snes3bppColorIndex((byte) 0x04, new int[] {144, 168, 232, 255}),
+        // 0b101: black // FIX
+        new Snes3bppColorIndex((byte) 0x05, new int[] {40, 40, 40, 255}),
+        // 0b110: light gold
+        new Snes3bppColorIndex((byte) 0x06, new int[] {248, 176, 80, 255}),
+        // 0b111: dark gold-brown
+        new Snes3bppColorIndex((byte) 0x07, new int[] {184, 96, 40, 255})
+    };
+
+    private static final Snes3bppColorIndex[] RED_LOOKUP = new Snes3bppColorIndex[] {
+        // 0b000: transparent
+        new Snes3bppColorIndex((byte) 0x00, new int[] {0, 0, 0, 0}),
+        // 0b001: white // FIX
+        new Snes3bppColorIndex((byte) 0x01, new int[] {248, 248, 248, 255}),
+        // 0b001: orange-brown
+        new Snes3bppColorIndex((byte) 0x02, new int[] {200, 88, 48, 255}),
+        // 0b011: dark red
+        new Snes3bppColorIndex((byte) 0x03, new int[] {176, 40, 40, 255}),
+        // 0b100: light red
+        new Snes3bppColorIndex((byte) 0x04, new int[] {224, 112, 112, 255}),
+        // 0b101: black // FIX
+        new Snes3bppColorIndex((byte) 0x05, new int[] {40, 40, 40, 255}),
+        // 0b110: light silver
+        new Snes3bppColorIndex((byte) 0x06, new int[] {184, 184, 200, 255}),
+        // 0b111: dark silver
+        new Snes3bppColorIndex((byte) 0x07, new int[] {120, 120, 136, 255})
+    };
+  }
+
+  static class Snes3bppColorIndex {
+
+    private final byte colorIndex;
+
+    private final int[] colors;
+
+    public Snes3bppColorIndex(final byte colorIndex, final int[] colors) {
+      this.colorIndex = colorIndex;
+      this.colors = colors;
+    }
+
+    public byte getColorIndex() {
+      return this.colorIndex;
+    }
+
+    public int[] getColors() {
+      return this.colors;
+    }
   }
 }

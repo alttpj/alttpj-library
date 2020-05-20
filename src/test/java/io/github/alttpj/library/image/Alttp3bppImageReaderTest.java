@@ -26,23 +26,9 @@ import io.github.alttpj.library.testhelper.SpriteBytes;
 import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 class Alttp3bppImageReaderTest {
-
-  @Test
-  void testUnpack3bppTiles() throws IOException {
-    final InputStream oneUpPackedUncompressedStream = this.getClass().getResourceAsStream("/gfx/u_1up.bin");
-    final byte[] inputPacked = readAllBytes(oneUpPackedUncompressedStream);
-
-    final byte[] unpacked = Alttp3bppImageReader.unpack3bppTiles(inputPacked);
-
-    assertAll(
-        () -> assertEquals(4096, unpacked.length)
-    );
-  }
 
   @Test
   public void testUncompress() throws IOException {
@@ -90,17 +76,4 @@ class Alttp3bppImageReaderTest {
     );
   }
 
-  private byte[] readAllBytes(final InputStream oneUpStream) throws IOException {
-    final byte[] inputCompressed;
-
-    try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-      final byte[] buffer = new byte[512];
-      int readCount;
-      while ((readCount = oneUpStream.read(buffer)) != -1) {
-        byteArrayOutputStream.write(buffer, 0, readCount);
-      }
-      inputCompressed = byteArrayOutputStream.toByteArray();
-    }
-    return inputCompressed;
-  }
 }

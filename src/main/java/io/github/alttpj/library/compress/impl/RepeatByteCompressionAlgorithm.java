@@ -42,7 +42,7 @@ public class RepeatByteCompressionAlgorithm extends AbstractCompressionAlgorithm
       repeatCount++;
     }
 
-    if (repeatCount < 4) {
+    if (repeatCount < 3) {
       // this is the same as just copying using Copy.cl=1
       return 0;
     }
