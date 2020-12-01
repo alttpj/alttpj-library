@@ -8,7 +8,13 @@ on: [ push, pull_request ]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+        java: [ 11, 15 ]
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
