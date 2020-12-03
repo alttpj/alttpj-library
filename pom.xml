@@ -403,14 +403,14 @@
       <id>deploy-github</id>
       <distributionManagement>
         <repository>
-          <id>alttpj</id>
+          <id>github</id>
           <name>GitHub alttpj Apache Maven Packages</name>
-          <url>https://maven.pkg.github.com/alttpj/repository</url>
+          <url>https://maven.pkg.github.com/alttpj/alttpj-library</url>
         </repository>
         <snapshotRepository>
-          <id>alttpj</id>
+          <id>github</id>
           <name>GitHub alttpj Apache Maven Packages</name>
-          <url>https://maven.pkg.github.com/alttpj/snapshot-repository</url>
+          <url>https://maven.pkg.github.com/alttpj/alttpj-library</url>
         </snapshotRepository>
       </distributionManagement>
     </profile>
