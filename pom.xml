@@ -346,6 +346,7 @@
               <quiet>true</quiet>
               <serialwarn>true</serialwarn>
               <release>9</release>
+              <detectJavaApiLink>false</detectJavaApiLink>
             </configuration>
             <executions>
               <execution>
