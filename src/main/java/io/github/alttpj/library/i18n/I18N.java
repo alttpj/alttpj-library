@@ -21,7 +21,7 @@ import java.util.PropertyResourceBundle;
 
 public final class I18N {
 
-  private static final String RESOURCE_NAME = "/alttpj.lib.properties";
+  private static final String RESOURCE_NAME = "/io/github/alttpj/library/alttpj.lib.properties";
 
   private I18N() {
     // util class

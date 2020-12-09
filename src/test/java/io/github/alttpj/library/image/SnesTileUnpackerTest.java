@@ -29,7 +29,7 @@ import java.io.InputStream;
 public class SnesTileUnpackerTest {
 
   @Test
-  void testUnpack3bppTiles() throws IOException {
+  public void testUnpack3bppTiles() throws IOException {
     final InputStream oneUpPackedUncompressedStream = this.getClass().getResourceAsStream("/gfx/u_1up.bin");
     final byte[] inputPacked = IOUtils.readAllBytes(oneUpPackedUncompressedStream);
 

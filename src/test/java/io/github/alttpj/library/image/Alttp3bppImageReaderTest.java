@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-class Alttp3bppImageReaderTest {
+public class Alttp3bppImageReaderTest {
 
   @Test
   public void testUncompress() throws IOException {

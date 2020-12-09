@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 public class IncrementByteCompressionAlgorithmTest {
 
   @Test
-  void testIncrementByteApplied() {
+  public void testIncrementByteApplied() {
     // given
     final IncrementByteCompressionAlgorithm incrementByteCompressionAlgorithm = new IncrementByteCompressionAlgorithm();
     final byte[] in = {(byte) 0xf0, (byte) 0xf1, (byte) 0xf2, (byte) 0xf3, (byte) 0xf4};
@@ -38,7 +38,7 @@ public class IncrementByteCompressionAlgorithmTest {
   }
 
   @Test
-  void testIncrementByteDetected() {
+  public void testIncrementByteDetected() {
     // given
     final IncrementByteCompressionAlgorithm incrementByteCompressionAlgorithm = new IncrementByteCompressionAlgorithm();
     final byte[] in = {(byte) 0xf0, (byte) 0xf1, (byte) 0xf2, (byte) 0xf3, (byte) 0xf4, (byte) 0x00};

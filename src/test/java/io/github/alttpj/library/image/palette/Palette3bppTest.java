@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 public class Palette3bppTest {
 
   @Test
-  void testGreen_idx4() {
+  public void testGreen_idx4() {
     final Palette green = Palette3bpp.GREEN;
 
     // when
@@ -40,7 +40,7 @@ public class Palette3bppTest {
    * Test that array is not too big.
    */
   @Test
-  void testGreen_outOfBounds() {
+  public void testGreen_outOfBounds() {
     // given
     final Palette green = Palette3bpp.GREEN;
 

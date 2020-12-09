@@ -18,19 +18,20 @@ package io.github.alttpj.library.compress;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 public class SnesDecompressorTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"1up", "birb", "coin", "icerod", "meat", "yoshi", "z1link"})
-  void testDecompression(final String gfx) throws IOException {
+  public void testDecompression(final String gfx) throws IOException {
     final byte[] expected;
     try (
         final InputStream oneUpStream = this.getClass().getResourceAsStream("/gfx/u_" + gfx + ".bin")) {
@@ -55,9 +56,9 @@ public class SnesDecompressorTest {
   }
 
   @Test
-  void testReadExtendedHeaderCommand4Length40() throws IOException {
+  public void testReadExtendedHeaderCommand4Length40() throws IOException {
     // given
-    final byte[] bytes = new byte[]{
+    final byte[] bytes = new byte[] {
         // copy one byte "as-is", to set up "already decompressed.
         (byte) 0b000_00000, (byte) 0x00,
         // "extended, command 4, len = 41, offset = 0
@@ -78,9 +79,9 @@ public class SnesDecompressorTest {
   }
 
   @Test
-  void testReadExtendedHeaderCommand4Length40Pos1() throws IOException {
+  public void testReadExtendedHeaderCommand4Length40Pos1() throws IOException {
     // given
-    final byte[] bytes = new byte[]{
+    final byte[] bytes = new byte[] {
         // copy next two bytes, to set up "already decompressed.
         (byte) 0b001_00001, (byte) 0x00,
         // "extended, command 4, len = 41, offset = 0

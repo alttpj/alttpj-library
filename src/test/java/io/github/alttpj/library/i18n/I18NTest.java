@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 public class I18NTest {
 
   @Test
-  void testString() {
+  public void testString() {
     final String indexNotZero = I18N.getString("IndexNotZero");
 
     assertAll(

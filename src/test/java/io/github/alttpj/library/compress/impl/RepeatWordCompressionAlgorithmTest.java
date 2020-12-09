@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 public class RepeatWordCompressionAlgorithmTest {
 
   @Test
-  void testSimplePatternApplied() {
+  public void testSimplePatternApplied() {
     // given
     final RepeatWordCompressionAlgorithm algo = new RepeatWordCompressionAlgorithm();
     final byte[] in = {(byte) 0xfa, (byte) 0xaf, (byte) 0xfa, (byte) 0xaf, (byte) 0xfa};
@@ -33,12 +33,12 @@ public class RepeatWordCompressionAlgorithmTest {
     final byte[] compressed = algo.apply(in, in.length - 1);
 
     // then
-    final byte[] expected = new byte[]{(byte) 0b010_00100, (byte) 0xfa, (byte) 0xaf};
+    final byte[] expected = new byte[] {(byte) 0b010_00100, (byte) 0xfa, (byte) 0xaf};
     assertArrayEquals(expected, compressed);
   }
 
   @Test
-  void testSimplePatternDetected() {
+  public void testSimplePatternDetected() {
     // given
     final RepeatWordCompressionAlgorithm algo = new RepeatWordCompressionAlgorithm();
     final byte[] in = {(byte) 0xfa, (byte) 0xaf, (byte) 0xfa, (byte) 0xaf, (byte) 0xfa, (byte) 0x00};

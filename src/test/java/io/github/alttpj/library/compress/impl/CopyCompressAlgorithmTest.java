@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 public class CopyCompressAlgorithmTest {
 
   @Test
-  void testCopyApplied() {
+  public void testCopyApplied() {
     // given
     final CopyCompressAlgorithm algorithm = new CopyCompressAlgorithm();
     final byte[] in = {(byte) 0xac, (byte) 0xad};

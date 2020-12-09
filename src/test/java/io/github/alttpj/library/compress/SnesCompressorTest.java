@@ -37,7 +37,7 @@ public class SnesCompressorTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"1up", "birb", "coin", "icerod", "meat", "yoshi", "z1link"})
-  void testCompression(final String gfx) throws IOException {
+  public void testCompression(final String gfx) throws IOException {
     // given
     final byte[] compressed;
     final int originalLength;
@@ -123,9 +123,9 @@ public class SnesCompressorTest {
   }
 
   @Test
-  void testCompressionSequenceRepeating() throws IOException {
+  public void testCompressionSequenceRepeating() throws IOException {
     // given
-    final byte[] in = new byte[]{
+    final byte[] in = new byte[] {
         (byte) 0xab, (byte) 0xaf, (byte) 0x12, (byte) 0x01, (byte) 0x43, (byte) 0x44, (byte) 0x41, (byte) 0x23,
         (byte) 0xab, (byte) 0xaf, (byte) 0x12, (byte) 0x01, (byte) 0x43, (byte) 0x44, (byte) 0x41, (byte) 0x23
     };
@@ -133,7 +133,7 @@ public class SnesCompressorTest {
     // when
     final byte[] compressed;
     try (final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(in);
-        final SnesCompressor snesCompressor = new SnesCompressor(byteArrayInputStream)) {
+         final SnesCompressor snesCompressor = new SnesCompressor(byteArrayInputStream)) {
       compressed = snesCompressor.getCompressed().toByteArray();
     }
 
