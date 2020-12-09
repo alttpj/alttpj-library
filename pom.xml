@@ -94,20 +94,6 @@
           <configuration>
             <release>${maven.compiler.release}</release>
           </configuration>
-          <executions>
-            <execution>
-              <id>module</id>
-              <goals>
-                <goal>compile</goal>
-              </goals>
-              <configuration>
-                <release>9</release>
-                <compileSourceRoots>
-                  <compileSourceRoot>${project.basedir}/src/main/module</compileSourceRoot>
-                </compileSourceRoots>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
 
         <plugin>
@@ -360,6 +346,8 @@
               <!-- do not show every java line -->
               <quiet>true</quiet>
               <serialwarn>true</serialwarn>
+              <!-- needs to be set as the second compiler execution messes this up. -->
+              <sourcepath>src/main/java</sourcepath>
             </configuration>
             <executions>
               <execution>
@@ -380,6 +368,35 @@
                 <goals>
                   <goal>jar-no-fork</goal>
                 </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>module</id>
+      <activation>
+        <jdk>[9,)</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>module</id>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+                <configuration>
+                  <release>9</release>
+                  <compileSourceRoots>
+                    <compileSourceRoot>${project.basedir}/src/main/module</compileSourceRoot>
+                  </compileSourceRoots>
+                </configuration>
               </execution>
             </executions>
           </plugin>
