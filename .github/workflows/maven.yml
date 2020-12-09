@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        java: [ 11, 15 ]
+        java: [ 11, 14 ]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -37,7 +37,7 @@ jobs:
         run: mvn clean verify -B -Pdocs,ci,run-its
 
       - name: Deploy snapshot
-        if: ${{ matrix.java == '15' && matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.java == '11' && matrix.os == 'ubuntu-latest' }}
         run: mvn deploy --batch-mode -Pdocs,deploy-github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
