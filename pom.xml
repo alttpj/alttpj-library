@@ -28,7 +28,7 @@
 
   <properties>
     <!-- compile to -->
-    <java.version>9</java.version>
+    <java.version>8</java.version>
     <!-- jdk version needed -->
     <jdk.version>11</jdk.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
@@ -41,6 +41,8 @@
 
     <!-- default fork arguments. -->
     <argLine>-Xmx1024m</argLine>
+
+    <dependency.junit.version>5.7.0</dependency.junit.version>
   </properties>
 
   <!-- dependencies in the management section are not forced upon the child modules. -->
@@ -51,13 +53,13 @@
         <artifactId>junit-jupiter-engine</artifactId>
         <groupId>org.junit.jupiter</groupId>
         <scope>test</scope>
-        <version>5.6.2</version>
+        <version>${dependency.junit.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-params</artifactId>
-        <version>5.6.2</version>
+        <version>${dependency.junit.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
@@ -91,9 +93,6 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <groupId>org.apache.maven.plugins</groupId>
           <version>3.8.1</version>
-          <configuration>
-            <release>${maven.compiler.release}</release>
-          </configuration>
         </plugin>
 
         <plugin>
@@ -167,8 +166,8 @@
         <configuration>
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
-          <source>9</source>
-          <target>9</target>
+          <!-- set this to 9, will recompile everything but module-info.java for java.version again. -->
+          <release>9</release>
         </configuration>
       </plugin>
       <plugin>
@@ -346,8 +345,7 @@
               <!-- do not show every java line -->
               <quiet>true</quiet>
               <serialwarn>true</serialwarn>
-              <!-- needs to be set as the second compiler execution messes this up. -->
-              <sourcepath>src/main/java</sourcepath>
+              <release>9</release>
             </configuration>
             <executions>
               <execution>
@@ -392,10 +390,10 @@
                   <goal>compile</goal>
                 </goals>
                 <configuration>
-                  <release>9</release>
-                  <compileSourceRoots>
-                    <compileSourceRoot>${project.basedir}/src/main/module</compileSourceRoot>
-                  </compileSourceRoots>
+                  <release>${java.version}</release>
+                  <excludes>
+                    <exclude>module-info.java</exclude>
+                  </excludes>
                 </configuration>
               </execution>
             </executions>
