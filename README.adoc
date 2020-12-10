@@ -14,18 +14,38 @@ This is useful if you are developing a ROM tool and need to:
 
 == How to use
 
-Maven repository will be set up later.
+You can use the Maven github repository.
 
 Coordinates will be:
 
 [source,xml]
 ----
-<!-- https://github.com/alttpj/alttpj-library -->
-<dependency>
-  <groupId>io.github.alttpj.library</groupId>
-  <artifactId>alttpj-library</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-</dependency>
+<project>
+  <!-- … -->
+
+  <dependencies>
+    <!-- https://github.com/alttpj/alttpj-library -->
+    <dependency>
+      <groupId>io.github.alttpj.library</groupId>
+      <artifactId>alttpj-library</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <!-- … -->
+
+  <repositories>
+    <repository>
+      <id>github</id>
+      <name>GitHub alttpj-library Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/alttpj/alttpj-library</url>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+
+  </repositories>
+
+</project>
 ----
 
 The root package is: `io.github.alttpj.library`
