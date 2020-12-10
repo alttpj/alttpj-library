@@ -42,3 +42,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Upload a Build Artifact
+        if: ${{ matrix.java == '11' && matrix.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: alttpj-library
+          path: target/alttpj-library-*.jar
+          if-no-files-found: error
